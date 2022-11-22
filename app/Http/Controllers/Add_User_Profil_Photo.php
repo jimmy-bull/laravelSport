@@ -52,7 +52,7 @@ class Add_User_Profil_Photo extends Controller
     }
 
     public function getProfilPhoto_mail(Request $request)
-    {
+    { return __DIR__.'/../vendor/autoload.php';
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
         if ($checkfirst > 0) {
             return Users_Profile_Photo::where('email', "=", $request->email)->value("image");
