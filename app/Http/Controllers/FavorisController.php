@@ -79,12 +79,7 @@ class FavorisController extends Controller
     }
     public function test(Request $request)
     {
-        return  DB::table('mshop_index_attribute')->join(
-            'mshop_index_catalog',
-            'mshop_index_attribute.prodid',
-            '=',
-            'mshop_index_catalog.prodid'
-        )->where('mshop_index_catalog.catid', '=', $request->catID)->select('type')->groupBy('type')->get();
+        return "ok jimmy";
     }
 
     public function seeIfLIked_GET(Request $request)

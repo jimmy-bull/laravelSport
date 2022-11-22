@@ -104,7 +104,7 @@ Route::middleware('throttle:120,1')->get(
 );
 //
 Route::middleware('throttle:120,1')->get(
-    '/testing/{catID}',
+    '/testing',
     [FavorisController::class, 'test']
 );
 
