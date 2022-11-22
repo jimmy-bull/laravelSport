@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // // // \App\Models\User::factory(10)->create();
         // // $this->call(MainProductsTableSeeder::class);
-        $this->call(UsersTableSeeder::class);
+        // $this->call(UsersTableSeeder::class);
         $this->call(PasswordResetsTableSeeder::class);
         $this->call(PersonalAccessTokensTableSeeder::class);
         // // $this->call(BidDataTableSeeder::class);
