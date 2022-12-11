@@ -55,7 +55,7 @@ class Teams extends Controller
         return json_encode('Vous devez vous reconnecter.');
         // return   $request->file('logo')->store('public/teams_photos');;
     }
-    public function getTeams(Request $request)
+    public function getTeams(Request $request) // getConnected user Teams
     {
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
 
@@ -64,6 +64,16 @@ class Teams extends Controller
         }
         return 'Vous devez vous reconnecter.';
     }
+
+    public function getTeams__(Request $request) // getConnected profil opened team
+    {
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            return Team::where('email', "=",  $request->email)->get();
+        }
+        return 'Vous devez vous reconnecter.';
+    }
+
     public function deleteTeam(Request $request)
     {
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
@@ -890,6 +900,28 @@ class Teams extends Controller
 
             return $_bidSend;
         }
+    }
+
+
+    public function exitATeam(Request $request) // when a team decide to quit a team
+    {
+        $checkfirst =  User::where('remember_token', "=",  trim($request->token))->count();
+        if ($checkfirst > 0) {
+            $mail = User::where('remember_token', "=",  trim($request->token))->value("email");
+            Teammember::where('who_want_to_join', "=", $mail)->where('team_to_join', "=", $request->team_to_join)->update(["status" => "exit"]);
+            return 'good';
+        }
+        return 'Vous devez vous reconnecter.';  // STATUS exit;
+    }
+
+    public function removeFromTeam(Request $request) // when the owner of the team remove a member from his team
+    {
+        $checkfirst =  User::where('remember_token', "=",  trim($request->token))->count();
+        if ($checkfirst > 0) {
+            Teammember::where('who_want_to_join', "=", $request->who_want_to_join)->where('team_to_join', "=", $request->team_to_join)->update(["status" => "exit"]);
+            return 'good';
+        }
+        return 'Vous devez vous reconnecter.';
     }
 }
 

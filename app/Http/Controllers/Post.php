@@ -9,6 +9,8 @@ use App\Models\ImageVideoTable;
 use App\Models\PostTable;
 use App\Models\FollowingSystem;
 use App\Models\like;
+use Illuminate\Support\Facades\Storage;
+use App\Models\sub_comments_table;
 
 class Post extends Controller
 {
@@ -91,7 +93,11 @@ class Post extends Controller
                     $imagesObj = new \stdClass();
                     $imagesObj->image = $value__->link;
                     $imagesObj->id = $i;
-                    $img_size = getimagesize(storage_path('app/' . $value__->link));
+                    if (Storage::disk('public')->exists(explode("public", $value__->link)[1])) {
+                        $img_size = getimagesize(storage_path('app/' . $value__->link));
+                    } else {
+                        $img_size = false;
+                    }
                     if ($img_size != false) {
                         $imagesObj->imageDimension = intval($img_size["0"])  / intval($img_size["1"]);
                     } else {
@@ -154,7 +160,13 @@ class Post extends Controller
                     $imagesObj = new \stdClass();
                     $imagesObj->image = $value__->link;
                     $imagesObj->id = $i;
-                    $img_size = getimagesize(storage_path('app/' . $value__->link));
+
+                    if (Storage::disk('public')->exists(explode("public", $value__->link)[1])) {
+                        $img_size = getimagesize(storage_path('app/' . $value__->link));
+                    } else {
+                        $img_size = false;
+                    }
+
                     if ($img_size != false) {
                         $imagesObj->imageDimension = intval($img_size["0"])  / intval($img_size["1"]);
                     } else {
@@ -213,15 +225,118 @@ class Post extends Controller
         }
     }
 
+    public function addSubComments(Request $request)
+    {
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            // if ($request->position == 'first') {
+            $user_id = User::where('remember_token', "=", $request->token)->select('id')->get();
+            $subcomments = new sub_comments_table();
+            $subcomments->comments = $request->comment;
+            $subcomments->who_commented_id = $user_id[0]->id;
+            $subcomments->main_comment_id = $request->main_comment_id;
+            $subcomments->comment_id = 0;
+            $subcomments->save();
+            // sub_comments_table::where('id', "=", $subcomments->id)->update(["comment_id" => $subcomments->id]);
+            // }
+            return 'good';
+        } else {
+            return "not connected";
+        }
+    }
+
+    public function addSubComments_sub(Request $request)
+    {
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            $user_id = User::where('remember_token', "=", $request->token)->select('id')->get();
+            $subcomments = new sub_comments_table();
+            $subcomments->comments = $request->comment;
+            $subcomments->who_commented_id = $user_id[0]->id;
+            $subcomments->main_comment_id = $request->main_comment_id;
+            $subcomments->comment_id = $request->comment_id;
+            $subcomments->save();
+        } else {
+            return "not connected";
+        }
+    }
+
     public function getComments(Request $request)
     {
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
         if ($checkfirst > 0) {
-            return Comment::join('users', "users.id", "=", "comments.who_commented_id")
+            $getMainComments =  Comment::join('users', "users.id", "=", "comments.who_commented_id")
                 ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
-                ->where('post_id', "=", $request->post_id)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname"])->get();
+                ->where('post_id', "=", $request->post_id)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname", "comments.id"])->get();
+
+            $newTable = [];
+            foreach ($getMainComments  as $key => $value) {
+                $count = sub_comments_table::where('main_comment_id', '=', $value->id)->count();
+                $customObj = new \stdClass();
+                $customObj->totalSubComment = $count;
+                $customObj->comment =  $value->comment;
+                $customObj->image =  $value->image;
+                $customObj->post_id =  $value->post_id;
+                $customObj->created_at =  $value->created_at;
+                $customObj->name =  $value->name;
+                $customObj->lastname =  $value->lastname;
+                $customObj->id =  $value->id;
+                array_push($newTable, $customObj);
+            }
+            return  $newTable;
         } else {
             return "not connected";
         }
+    }
+
+    public function loadSubComments(Request $request) // Load first subComments of main comments
+    {
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            $comments =  sub_comments_table::join('users', "users.id", "=", "sub_comments_tables.who_commented_id")
+                ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
+                // ->whereRaw('comment_id = 0')
+                ->where('main_comment_id', "=", $request->main_comment_id)->select(["comments", "image",  "sub_comments_tables.created_at", "users.name", "users.lastname", "sub_comments_tables.id"])->get();
+            $newTable = [];
+            foreach ($comments  as $key => $value) {
+                $count = sub_comments_table::where('comment_id', '=', $value->id)->count();
+                $customObj = new \stdClass();
+                $customObj->totalSubComment = $count;
+                $customObj->comment =  $value->comments;
+                $customObj->image =  $value->image;
+                // $customObj->post_id =  $value->post_id;
+                $customObj->created_at =  $value->created_at;
+                $customObj->name =  $value->name;
+                $customObj->lastname =  $value->lastname;
+                $customObj->id =  $value->id;
+                array_push($newTable, $customObj);
+            }
+            return  $newTable;
+        } else {
+            return "not connected";
+        }
+    }
+
+    public function loadSubComments_sub(Request $request) // Load first subComments of main comments
+    {
+        $comments =  sub_comments_table::join('users', "users.id", "=", "sub_comments_tables.who_commented_id")
+            ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
+            ->where('comment_id', "=", $request->comment_id)->select(["comments", "image",  "sub_comments_tables.created_at", "users.name", "users.lastname", "sub_comments_tables.id"])->get();
+
+        $newTable = [];
+        foreach ($comments  as $key => $value) {
+            $count = sub_comments_table::where('comment_id', '=', $value->id)->count();
+            $customObj = new \stdClass();
+            $customObj->totalSubComment = $count;
+            $customObj->comment =  $value->comments;
+            $customObj->image =  $value->image;
+            // $customObj->post_id =  $value->post_id;
+            $customObj->created_at =  $value->created_at;
+            $customObj->name =  $value->name;
+            $customObj->lastname =  $value->lastname;
+            $customObj->id =  $value->id;
+            array_push($newTable, $customObj);
+        }
+        return  $newTable;
     }
 }

@@ -234,6 +234,8 @@ Route::get('/getUserName_mail_visted_profil/{token}/{email}', [Add_User_Profil_P
 Route::post('/add_teams', [Teams::class, 'add_teams']);
 
 Route::get('/get_teams/{token}', [Teams::class, 'getTeams']);
+Route::get('/get_teams__/{email}/{token}', [Teams::class, 'getTeams__']);
+
 
 Route::get('/deleteTeam/{token}/{id}', [Teams::class, 'deleteTeam']);
 
@@ -375,6 +377,24 @@ Route::get('/getpostonfield/{token}', [Post::class, 'getPostONfield']);
 Route::get('/add_likes/{post_id}/{token}', [Post::class, 'addLikes']);
 Route::get('/add_comments/{post_id}/{comment}/{token}', [Post::class, 'addComments']);
 Route::get('/get_comments/{post_id}/{token}', [Post::class, 'getComments']);
+
+
+
+Route::get('/exitateam/{team_to_join}/{token}', [Teams::class, 'exitATeam']);
+Route::get('/removefromteam/{team_to_join}/{who_want_to_join}/{token}', [Teams::class, 'removeFromTeam']);
+
+
+Route::get('/loadsubcomments/{main_comment_id}/{token}', [Post::class, 'loadSubComments']);
+
+Route::get('/loadsubcommentsub/{comment_id}/{token}', [Post::class, 'loadSubComments_sub']);
+
+
+
+Route::get('/addsubcomments/{comment}/{main_comment_id}/{token}', [Post::class, 'addSubComments']);
+
+Route::get('/addsubcommentsub/{comment}/{main_comment_id}/{comment_id}/{token}', [Post::class, 'addSubComments_sub']);
+
+
 // 
 
 // {title}/{who_can_see}/{status}/{token}
