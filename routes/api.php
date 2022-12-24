@@ -373,10 +373,13 @@ Route::post('/add_post', [Post::class, 'add_post']);
 
 Route::get('/get_post/{token}/{who}', [Post::class, 'getPost']);
 
+Route::get('/get_post_id/{token}/{who}/{id}', [Post::class, 'getPost_Id']);
+
+
 Route::get('/getpostonfield/{token}', [Post::class, 'getPostONfield']);
 Route::get('/add_likes/{post_id}/{token}', [Post::class, 'addLikes']);
 Route::get('/add_comments/{post_id}/{comment}/{token}', [Post::class, 'addComments']);
-Route::get('/get_comments/{post_id}/{token}', [Post::class, 'getComments']);
+Route::get('/get_comments/{post_id}/{postType}/{token}', [Post::class, 'getComments']);
 
 
 
@@ -386,13 +389,17 @@ Route::get('/removefromteam/{team_to_join}/{who_want_to_join}/{token}', [Teams::
 
 Route::get('/loadsubcomments/{main_comment_id}/{token}', [Post::class, 'loadSubComments']);
 
-Route::get('/loadsubcommentsub/{comment_id}/{token}', [Post::class, 'loadSubComments_sub']);
+// Route::get('/loadsubcommentsub/{comment_id}/{token}', [Post::class, 'loadSubComments_sub']);
 
 
 
 Route::get('/addsubcomments/{comment}/{main_comment_id}/{token}', [Post::class, 'addSubComments']);
 
 Route::get('/addsubcommentsub/{comment}/{main_comment_id}/{comment_id}/{token}', [Post::class, 'addSubComments_sub']);
+
+Route::get('/add_comment_likes/{comment_id}/{token}', [Post::class, 'addCommentsLikes']);
+
+Route::get('/add_sub_comment_likes/{main_comment_id}/{comment_id}/{token}', [Post::class, 'addSubCommentsLikes']);
 
 
 // 

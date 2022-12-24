@@ -13,6 +13,7 @@ use App\Models\Defeat;
 use App\Models\draw;
 use stdClass;
 use App\Models\TeamRate;
+use App\Models\PostTable;
 
 class Teams extends Controller
 {
@@ -601,6 +602,20 @@ class Teams extends Controller
             Winning::where('game_id', "=", $request->game_id)->update(['status' => "accepted"]);
             Defeat::where('game_id', "=", $request->game_id)->update(['status' => "accepted"]);
             draw::where('game_id', "=", $request->game_id)->update(['status' => "accepted"]);
+            $emails =  AskGame::where('id', "=", $request->game_id)->select(['who_is_asking', "who_was_asked"])->get();
+            $ids = [];
+            foreach ($emails  as  $value) {
+                array_push($ids, User::where('email', "=", $value->who_is_asking)->value("id"), User::where('email', "=", $value->who_was_asked)->value("id"));
+            }
+            for ($i = 0; $i < count($ids); $i++) {
+                $post = new PostTable();
+                $post->title = $request->game_id;
+                $post->user_id = $ids[$i];
+                $post->who_can_see = "monde";
+                $post->status = "online";
+                $post->post_type = "automatique";
+                $post->save();
+            }
             return 'good';
         } else return "not connected";
     }
@@ -674,7 +689,7 @@ class Teams extends Controller
             $who_was_asked = [];
             if ($request->season == 'h') {
                 $team_of_asker = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                    ->where('ask_games.team_of_asker', '=',  $request->team)
+                    ->where('ask_games.team_of_asker', '=',  $request->team) // who_is_asking or who_was_asked 
                     ->where('ask_games.status', "=", 'finish')
                     ->whereBetween("date_of_game", [date(intval($request->years) . "-11"), date(intval($request->years + 1) . "-02")])
                     ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
