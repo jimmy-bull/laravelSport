@@ -72,20 +72,55 @@ class Email_verif extends Controller
 
     public function changePass($email)
     {
-        $code = md5(strval($this->generateUniqueCode()));
-        $verif = new verification();
-        $verif->email = $email;
-        $verif->verification_code =  $code;
-        $verif->verification_code_end =  $this->addMinutes();
-        $verif->save();
+        $verify_if_email_exist = User::where('email', "=", $email)->count();
+        if ($verify_if_email_exist > 0) {
+            $code = $this->generateUniqueCode();
+            $verif = new verification();
+            $verif->email = $email;
+            $verif->verification_code =  $code;
+            $verif->verification_code_end =  $this->addMinutes();
+            $verif->save();
 
 
-        $info = [
-            'requestCode' =>   $code
-        ];
-        Mail::to($email)->send(new Forgotpass($info));
+            $info = [
+                'requestCode' =>   $code
+            ];
+            Mail::to($email)->send(new Forgotpass($info));
 
-        return "mail have been sent";
+            return "mail have been sent";
+        }
+        return "Aucun compte n'est associé à cet email";
+    }
+
+    public function changePass_mobile_application(Request $request)
+    {
+        $verify_if_email_exist = User::where('email', "=",  $request->email)->count();
+        if ($verify_if_email_exist > 0) {
+            $code = $this->generateUniqueCode();
+            $verif = new verification();
+            $verif->email =  $request->email;
+            $verif->verification_code =  $code;
+            $verif->verification_code_end =  $this->addMinutes();
+            $verif->save();
+
+
+            $info = [
+                'requestCode' =>   $code
+            ];
+            Mail::to($request->email)->send(new Forgotpass($info));
+
+            return "mail have been sent";
+        }
+        return "Aucun compte n'est associé à cet email.";
+    }
+
+    public function checkupdatepass(Request $request)
+    {
+        if (verification::where("verification_code", "=", $request->code)->where('verification_code_end', '>=', date('Y-m-d H:i:s'))->count() == 1) {
+            return "code good";
+        } else {
+            return 'code expire';
+        }
     }
 
     public function updatepass(Request $request)
@@ -102,6 +137,8 @@ class Email_verif extends Controller
         }
     }
 
+
+
     public function testIfrequestExpire(Request $request)
     {
         if (verification::where("verification_code", "=", $request->code)->where('verification_code_end', '>=', date('Y-m-d H:i:s'))->count() == 0) {
@@ -111,4 +148,3 @@ class Email_verif extends Controller
         }
     }
 }
-

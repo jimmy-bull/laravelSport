@@ -21,16 +21,16 @@
             --bs-menu-bg: #30A0E0;
             --bs-menu-alt-bg: #00B0A0;
         }
-
     </style>
     <div>
         <h1>Hi,</h1>
         <div>
             <p>Forgot your password ? Carefree ! It happens to everyone.</p>
             <h4>
-                <a href="//{{ Request::getHost() }}/changepass/{{ $data['requestCode'] }}">
+                {{-- <a href="//{{ Request::getHost() }}/changepass/{{ $data['requestCode'] }}">
                     click here to change it
-                </a>
+                </a> --}}
+                Enter this code in the application to change your password: {{ $data['requestCode'] }}
             </h4>
             <h1>Please note this link is only valid for 30 minutes !</h1>
         </div>

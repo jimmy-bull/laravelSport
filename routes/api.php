@@ -169,10 +169,15 @@ Route::get('/myemailverify', [Email_verif::class, 'index']);
 
 Route::get('/confirmemail/{code}', [Email_verif::class, 'confirmemail']);
 
+Route::get('/changePass_mobile_application/{email}', [Email_verif::class, 'changePass_mobile_application']);
+
+
 Route::get('/changepass/{email}', [Email_verif::class, 'changePass']);
 
-Route::get('/updatepass/{pass}/{code}', [Email_verif::class, 'updatepass']);
+Route::get('/checkupdatepass/{code}', [Email_verif::class, 'checkupdatepass']);
 
+Route::get('/updatepass/{pass}/{code}', [Email_verif::class, 'updatepass']);
+// 
 Route::get('/testIfrequestExpire/{code}', [Email_verif::class, 'testIfrequestExpire']);
 
 // Route::get('/paypal', [Paypal_::class, 'payp']);
@@ -232,6 +237,8 @@ Route::get('/getUserName_mail_visted_profil/{token}/{email}', [Add_User_Profil_P
 
 
 Route::post('/add_teams', [Teams::class, 'add_teams']);
+Route::get('/test_team/{team}/{sport_name}', [Teams::class, 'testTeam']);
+
 
 Route::get('/get_teams/{token}', [Teams::class, 'getTeams']);
 Route::get('/get_teams__/{email}/{token}', [Teams::class, 'getTeams__']);
@@ -274,7 +281,7 @@ Route::get('/getRealtimeNotif_count/{token}', [Interaction::class, 'getRealtimeN
 
 
 Route::get(
-    '/addRealtimeNotif/{token}/{message}/{notification_actions}/{who}/{who_sent}',
+    '/addRealtimeNotif/{token}/{message}/{notification_actions}/{who}/{who_sent}/{teammembers_id}',
     [Interaction::class, 'addRealtimeNotif']
 );
 
@@ -380,6 +387,10 @@ Route::get('/getpostonfield/{token}', [Post::class, 'getPostONfield']);
 Route::get('/add_likes/{post_id}/{token}', [Post::class, 'addLikes']);
 Route::get('/add_comments/{post_id}/{comment}/{token}', [Post::class, 'addComments']);
 Route::get('/get_comments/{post_id}/{postType}/{token}', [Post::class, 'getComments']);
+
+// 
+Route::get('/get_likes_and_comments_count/{id}/{token}', [Post::class, 'getLikesAndCommentsCount']);
+
 
 
 

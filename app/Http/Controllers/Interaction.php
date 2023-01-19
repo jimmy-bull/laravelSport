@@ -10,6 +10,7 @@ use App\Models\Team;
 use App\Models\FollowingSystem;
 use App\Models\NotificationToken;
 use App\Models\Notification;
+use App\Models\Teammember;
 
 class Interaction extends Controller
 {
@@ -257,7 +258,7 @@ class Interaction extends Controller
 
 
 
-    public function followingSystem_check(Request $request)
+    public function followingSystem_check(Request $request) // CHECK IF I'M ALREADY FOLLWING OR NOT A CURRENT USER
     {
         $mail =  User::where('remember_token', "=", $request->token)->value('email');
         $checkSub =  FollowingSystem::where('thefollower', "=", $mail)->where('thefollowed', "=", $request->email)->value("thefollowingState");
@@ -268,7 +269,7 @@ class Interaction extends Controller
         }
     }
 
-    public function followingSystem_check_2(Request $request)
+    public function followingSystem_check_2(Request $request)  // CHECK IF A CURRENT USER IS ALREADY FOLLWING ME OR NOT
     {
         $mail =  User::where('remember_token', "=", $request->token)->value('email');
         $checkSub =  FollowingSystem::where('thefollower', "=",  $request->email)->where('thefollowed', "=", $mail)->value("thefollowingState");
@@ -320,6 +321,8 @@ class Interaction extends Controller
         $realtimeNotif->save();
 
         if (trim($request->notification_actions) == "integration_actions") {
+            //  UPDATE teammembers with notifications_id depending on 
+            Teammember::where('id', "=",  $request->teammembers_id)->update(['notifications_id' => $realtimeNotif->id]);
             return [$realtimeNotif->id,  Notification::where('email', "=", $request->who)
                 ->where('state', '=', "unreaded")
                 ->orderBy("id", 'desc')->count()];

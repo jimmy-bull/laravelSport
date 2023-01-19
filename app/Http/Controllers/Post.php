@@ -218,11 +218,12 @@ class Post extends Controller
                     "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team", "post_tables.created_at as post_tables_created_at",
                     'ask_games.status', "teams.sport_name", "post_tables.id as post_tables_id",
                 ])
-                ->orderBy("post_tables_created_at", "DESC")->get()->skip(0)->take(11)->groupBy("post_id");
-            // return  $fromDB;
+                ->orderBy("post_tables_created_at", "DESC")->get()->groupBy("post_tables_id")->skip(0)->take(10);
+            // 
+            //return  $fromDB;
             foreach ($fromDB as $key => $value) {
                 $images = [];
-                if ($key == "") {
+                if ($value[0]->type == null) {
                     $unique_objects = [];
                     foreach ($value as $obj) {
                         if (!array_key_exists(intval($obj->title), $unique_objects)) {
@@ -333,7 +334,8 @@ class Post extends Controller
                         }
                         array_push($newTable, $customObj);
                     }
-                } else {
+                } else if ($value[0]->type != null) {
+
                     $customObj = new \stdClass();
                     $customObj->id = $key;
                     $countLikes =  like::where('post_id', "=", $key)->count();
@@ -383,6 +385,7 @@ class Post extends Controller
                         $customObj->country = $value__->country;
                         $customObj->posterName = $value__->lastname . " " . $value__->name;
                         $customObj->posterImage = $value__->image;
+                        $customObj->email = $value__->email;
 
                         $i++;
                     }
@@ -465,6 +468,32 @@ class Post extends Controller
             $subcomments->main_comment_id = $request->main_comment_id;
             $subcomments->comment_id = $request->comment_id;
             $subcomments->save();
+        } else {
+            return "not connected";
+        }
+    }
+
+    public function getLikesAndCommentsCount(Request $request)
+    {
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            $countLikes =  like::where('post_id', "=", $request->id)->count();
+            $getCommentID =  Comment::where('post_id', "=", $request->id)->select('id')->get();
+            $user_id = User::where('remember_token', "=", $request->token)->select('id')->get();
+            $idCommentsTable = [];
+            foreach ($getCommentID as  $valueO) {
+                array_push($idCommentsTable, $valueO->id);
+            }
+            $countComments =  Comment::where('post_id', "=", $request->id)->count() +  sub_comments_table::whereIn('main_comment_id', $idCommentsTable)->count();
+            $meLikes =  like::where('post_id', "=", $request->id)->where('who_liked_id', "=", $user_id[0]->id)->count();
+            $meLikesState = null;
+            if ($meLikes > 0) {
+                $meLikesState = true;
+            } else {
+                $meLikesState = false;
+            }
+            $table = [$countLikes, $countComments, $meLikesState];
+            return $table;
         } else {
             return "not connected";
         }

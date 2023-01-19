@@ -14,6 +14,8 @@ use App\Models\draw;
 use stdClass;
 use App\Models\TeamRate;
 use App\Models\PostTable;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\SqlRAws;
 
 class Teams extends Controller
 {
@@ -26,10 +28,18 @@ class Teams extends Controller
             ->count();
 
         $checksum =  Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value("email"))->count();
-        //  return $checkfirst;
+
+        $email =  User::where('remember_token', "=", $request->token)->select('email')->get();
+        $teamMemebersCheck = Teammember::where('who_want_to_join', "=", $email[0]->email)->where('status', "!=", "declined")->where('status', "!=", "exit")->select("team_to_join")->get();
+        $tableOfTeamcheck = [];
+        foreach ($teamMemebersCheck  as $value) {
+            array_push($tableOfTeamcheck, $value->team_to_join);
+        }
+        $checkSportIntegrated = Team::whereIn('team_name', $tableOfTeamcheck)->where('sport_name', "=", $request->sport_name)->select('sport_name')->count();
         if ($checkfirst > 0) {
+
             if ($checksum < 6) {
-                if ($checkname == 0 &&  $checksport == 0) {
+                if ($checkname == 0 &&  $checksport == 0 && $checkSportIntegrated == 0) {
                     $mail = User::where('remember_token', "=", $request->token)->value("email");
                     $team = new Team();
                     $team->email = $mail;
@@ -49,6 +59,11 @@ class Teams extends Controller
                 if ($checksport  > 0) {
                     return json_encode("Vous avez deja crée une equipe avec ce sport. Veuillez-en choisir un autre.");
                 }
+                if ($checkSportIntegrated > 0) {
+                    return json_encode("Vous avez déjà rejoint une équipe avec le sport: "
+                        . $request->sport_name .
+                        ". Impossible d'être dans deux équipes du même sport.");
+                }
             } else {
                 return json_encode("Vous pouvez ajouter que six équipes maximum.");
             }
@@ -56,6 +71,7 @@ class Teams extends Controller
         return json_encode('Vous devez vous reconnecter.');
         // return   $request->file('logo')->store('public/teams_photos');;
     }
+
     public function getTeams(Request $request) // getConnected user Teams
     {
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
@@ -221,17 +237,47 @@ class Teams extends Controller
     {
         $checkfirst =  User::where('remember_token', "=",  trim($request->token))->count();
         if ($checkfirst > 0) {
-            $mail = User::where('remember_token', "=",  trim($request->token))->value("email");
-            $team = new Teammember();
-            $team->team_to_join    =  trim($request->team_to_join);
-            $team->who_want_to_join   = $mail;
-            $team->team_to_join_owner    =  trim($request->team_to_join_owner);
-            $team->notifications_id     =  trim($request->id);
-            $team->save();
-            return 'good';
+            $getSport = Team::where('team_name', "=", $request->team_to_join)->select('sport_name')->get();
+            $getemail =  User::where('remember_token', "=", $request->token)->select('email')->get();
+            $countTeam = Team::where('email', "=",  $getemail[0]->email)->where('sport_name', "=", $getSport[0]->sport_name)->count();
+
+
+            $teamMemebersCheck = Teammember::where('who_want_to_join', "=", $getemail[0]->email)->where('status', "!=", "declined")->where('status', "!=", "exit")->select("team_to_join")->get();
+            $tableOfTeamcheck = [];
+            foreach ($teamMemebersCheck  as $value) {
+                array_push($tableOfTeamcheck, $value->team_to_join);
+            }
+            $checkSportIntegrated = Team::whereIn('team_name', $tableOfTeamcheck)->where('sport_name', "=",  $getSport[0]->sport_name)->select('sport_name')->count();
+
+
+            if ($countTeam == 0 && $checkSportIntegrated == 0) {
+                $mail = User::where('remember_token', "=",  trim($request->token))->value("email");
+                $team = new Teammember();
+                $team->team_to_join    =  trim($request->team_to_join);
+                $team->who_want_to_join   = $mail;
+                $team->team_to_join_owner    =  trim($request->team_to_join_owner);
+                $team->notifications_id     =  trim($request->id);
+                $team->save();
+                return ['good', $team->id];
+            }
+            if ($checkSportIntegrated > 0) {
+                return json_encode("Vous avez déjà rejoint une équipe avec le sport: "
+                    . $getSport[0]->sport_name .
+                    ". Impossible d'être dans deux équipes du même sport.");
+            }
+            if ($countTeam > 0) {
+                return 'Vous avez déja créé une équipe du même sport que l\'équipe que vous souhaitez rejoindre.';
+            }
         }
         return 'Vous devez vous reconnecter.';
     }
+
+    // public function updateTeamNotifID(Request $request)
+    // {
+    //     ////////////
+    // }
+
+
     public function askeforgame(Request $request)
     {
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
@@ -664,185 +710,40 @@ class Teams extends Controller
         }
         return 'not connected';
     }
+    public function testTeam(Request $request)
+    {
+        // $range =  SqlRAws::getTeamRange($request->team, $request->sport_name, 2023, 2, 5);
+        // foreach ($range  as $key => $value) {
+        //     return $value->ranking;
+        // }
+    }
     public function palmares(Request $request)
     {
-        // [en fonction des saison: hiver ete printemp  de chaque année
-        // nombre de match jouer, [nombre de victoire, nombre de defaites, nombre de match null]
-        // la liste des match]
-        //Année
-        // hiver | printemp | été === topbar in react native 
-
-        // nombre de match jouer
-        // 30 victore 2 defaite 16 match null ==== faire des cercle
-        // acccordions des liste de match
-
-        //printemps == 02 à 05 == est egale a 2 ou est inferieur a 5               [2,3,4] = printemps  = p
-        //ete == 05-08 == est egale a 5 ou est inferieur a 8                       [5,6,7]  = ete = e
-        //automne == 08-11 = est egale à 8 ou est inferieur a 11                   [8,9,10] = automne = a
-        //hiver == 11-02 == est egale 11 ou est inferieur a 2 ou est egale a 12    [11,12,1] = hiver = h
-
-
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
         if ($checkfirst > 0) {
             $finish = [];
             $team_of_asker = [];
             $who_was_asked = [];
             if ($request->season == 'h') {
-                $team_of_asker = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                    ->where('ask_games.team_of_asker', '=',  $request->team) // who_is_asking or who_was_asked 
-                    ->where('ask_games.status', "=", 'finish')
-                    ->whereBetween("date_of_game", [date(intval($request->years) . "-11"), date(intval($request->years + 1) . "-02")])
-                    ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                    ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                    ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                    ->select([
-                        'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                        "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                        "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                    ])
-                    ->get()->unique()->skip($request->page)->take(10);
-
-
-                // ["teamname2" => 2, "teamname2" => 3, 'teamname3'=>5 ]  = victory
-
-                // ["teamname2" => 1, "teamname2" => 5 ]  = lost
-
-
-                // $ClassementW = Winning::join('ask_games', "winnings.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-11"), date(intval($request->years + 1) . "-02")])
-                //     ->whereRaw("YEAR(winnings.created_at) = " . $request->years)->get()->groupBy("winner_team"); // 
-                // return  $ClassementW;
-
-                // $ClassementL = Defeat::join('ask_games', "defeats.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-11"), date(intval($request->years + 1) . "-02")])
-                //     ->whereRaw("YEAR(defeats.created_at) = " . $request->years)->get()->groupBy("looser_team"); // 
-                // return  $ClassementL;
-
+                $team_of_asker = SqlRAws::palmares_fuction($request->team, $request->years, $request->page, 11, 2);
             } else if ($request->season == 'p') {
-                $team_of_asker = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                    ->where('ask_games.team_of_asker', '=',  $request->team)
-                    ->where('ask_games.status', "=", 'finish')
-                    ->whereBetween("date_of_game", [date(intval($request->years) . "-02"), date(intval($request->years) . "-05")])
-                    ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                    ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                    ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                    ->select([
-                        'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                        "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                        "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                    ])
-                    ->get()->unique()->skip($request->page)->take(10);
-
-
-
-                // $ClassementW = Winning::join('ask_games', "winnings.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-02"), date(intval($request->years) . "-05")])
-                //     ->whereRaw("YEAR(winnings.created_at) = " . $request->years)->get()->groupBy("winner_team"); // 
-                // return  $ClassementW;
-
-                // $ClassementL = Defeat::join('ask_games', "defeats.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-02"), date(intval($request->years) . "-05")])
-                //     ->whereRaw("YEAR(defeats.created_at) = " . $request->years)->get()->groupBy("looser_team"); // 
-                // return  $ClassementL;
+                $team_of_asker = SqlRAws::palmares_fuction($request->team, $request->years, $request->page, 2, 5);
             } else if ($request->season == 'e') {
-                $team_of_asker = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                    ->where('ask_games.team_of_asker', '=',  $request->team)
-                    ->where('ask_games.status', "=", 'finish')
-                    ->whereBetween("date_of_game", [date(intval($request->years) . "-05"), date(intval($request->years) . "-08")])
-                    ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                    ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                    ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                    ->select([
-                        'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                        "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                        "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                    ])
-                    ->get()->unique()->skip($request->page)->take(10);
-
-
-                // $ClassementW = Winning::join('ask_games', "winnings.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-05"), date(intval($request->years) . "-08")])
-                //     ->whereRaw("YEAR(winnings.created_at) = " . $request->years)->get()->groupBy("winner_team"); // 
-                // //  return  $ClassementW;
-
-                // $ClassementL = Defeat::join('ask_games', "defeats.game_id", "=", "ask_games.id")
-                //     ->whereBetween("date_of_game", [date(intval($request->years) . "-05"), date(intval($request->years) . "-08")])
-                //     ->whereRaw("YEAR(defeats.created_at) = " . $request->years)->get()->groupBy("looser_team"); // 
-                // return  $ClassementL;
+                $team_of_asker = SqlRAws::palmares_fuction($request->team, $request->years, $request->page, 5, 8);
             } else if ($request->season == 'a') {
-                $team_of_asker = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                    ->where('ask_games.team_of_asker', '=',  $request->team)
-                    ->where('ask_games.status', "=", 'finish')
-                    ->whereBetween("date_of_game", [date(intval($request->years) . "-08"), date(intval($request->years) . "-11")])
-                    ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                    ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                    ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                    ->select([
-                        'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                        "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                        "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                    ])
-                    ->get()->unique()->skip($request->page)->take(10);
+                $team_of_asker = SqlRAws::palmares_fuction($request->team, $request->years, $request->page, 8, 11);
             }
             if (count($team_of_asker) == 10) {
                 return ($team_of_asker);
             } else if (count($team_of_asker) < 10) {
                 if ($request->season == 'h') {
-                    $who_was_asked = AskGame::leftJoin('teams', "ask_games.team_of_who_was_asked", '=', "teams.team_name")
-                        ->where('ask_games.team_of_who_was_asked', '=',  $request->team)
-                        ->where('ask_games.status', "=", 'finish')
-                        ->whereBetween("date_of_game", [date(intval($request->years) . "-11"), date(intval($request->years + 1) . "-02")])
-                        ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                        ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                        ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                        ->select([
-                            'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                            "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                            "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                        ])
-                        ->get()->unique()->skip($request->page)->take(10);
+                    $who_was_asked = SqlRAws::palmares_fuction_who_was_asked($request->team, $request->years, $request->page, 11, 2);
                 } else if ($request->season == 'p') {
-                    $who_was_asked = AskGame::leftJoin('teams', "ask_games.team_of_who_was_asked", '=', "teams.team_name")
-                        ->where('ask_games.team_of_who_was_asked', '=',  $request->team)
-                        ->where('ask_games.status', "=", 'finish')
-                        ->whereBetween("date_of_game", [date(intval($request->years) . "-02"), date(intval($request->years) . "-05")])
-                        ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                        ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                        ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                        ->select([
-                            'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                            "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                            "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                        ])
-                        ->get()->unique()->skip($request->page)->take(10);
+                    $who_was_asked = SqlRAws::palmares_fuction_who_was_asked($request->team, $request->years, $request->page, 2, 5);
                 } else if ($request->season == 'e') {
-                    $who_was_asked = AskGame::leftJoin('teams', "ask_games.team_of_who_was_asked", '=', "teams.team_name")
-                        ->where('ask_games.team_of_who_was_asked', '=',  $request->team)
-                        ->where('ask_games.status', "=", 'finish')
-                        ->whereBetween("date_of_game", [date(intval($request->years) . "-05"), date(intval($request->years) . "-08")])
-                        ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                        ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                        ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                        ->select([
-                            'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                            "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                            "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                        ])
-                        ->get()->unique()->skip($request->page)->take(10);
+                    $who_was_asked = SqlRAws::palmares_fuction_who_was_asked($request->team, $request->years, $request->page, 5, 8);
                 } else if ($request->season == 'a') {
-                    $who_was_asked = AskGame::leftJoin('teams', "ask_games.team_of_who_was_asked", '=', "teams.team_name")
-                        ->where('ask_games.team_of_who_was_asked', '=',  $request->team)
-                        ->where('ask_games.status', "=", 'finish')
-                        ->whereBetween("date_of_game", [date(intval($request->years) . "-08"), date(intval($request->years) . "-11")])
-                        ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
-                        ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
-                        ->leftJoin('draws', "ask_games.id", '=', "draws.game_id")
-                        ->select([
-                            'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                            "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                            "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team",  'ask_games.status', "teams.sport_name"
-                        ])
-                        ->get()->unique()->skip($request->page)->take(10);
+                    $who_was_asked = SqlRAws::palmares_fuction_who_was_asked($request->team, $request->years, $request->page, 8, 11);
                 }
                 foreach ($team_of_asker as $key => $value) {
                     array_push($finish, $value);
@@ -868,10 +769,22 @@ class Teams extends Controller
                 }
             }
 
+
+            $range = 0; // IF STAYS NULL THAT MEANS THAT THE TEAM DID NOT PLAY A GAME IN THE CURRENT SEASON 
+            if (count($finish) > 0) {
+                foreach (SqlRAws::getTeamRange($request->team, $finish[0]->sport_name)  as $key => $value) {
+                    $range = $value->ranking; // GET USER RANGE DEPENDINF ON SPORT AND SEASON
+                }
+            }
+
+
+
+
+
+
             $team_of_asker__ = AskGame::leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
                 ->where('ask_games.team_of_asker', '=',  $request->team)
                 ->where('ask_games.status', "=", 'finish')
-                //  ->whereBetween("date_of_game", [date(intval($request->years) - 1), date(intval($request->years) + 1)])
                 ->whereRaw("YEAR(date_of_game) = " . $request->years)
                 ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
                 ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
@@ -886,7 +799,7 @@ class Teams extends Controller
             $who_was_asked__ = AskGame::leftJoin('teams', "ask_games.team_of_who_was_asked", '=', "teams.team_name")
                 ->where('ask_games.team_of_who_was_asked', '=',  $request->team)
                 ->where('ask_games.status', "=", 'finish')
-                // ->whereBetween("date_of_game", [date(intval($request->years) - 1), date(intval($request->years) + 1)])
+
                 ->whereRaw("YEAR(date_of_game) = " . $request->years)
                 ->leftJoin('winnings', "ask_games.id", '=', "winnings.game_id")
                 ->leftJoin('defeats', "ask_games.id", '=', "defeats.game_id")
@@ -909,16 +822,16 @@ class Teams extends Controller
 
             $_bidSend->alldefeat = $alldefeat;
             $_bidSend->alldraws = $alldraws;
+            $_bidSend->rang = $range;
 
             $_bidSend->gameList = $finish;
-
-
             return $_bidSend;
         }
+        return 'Vous devez vous reconnecter.';
     }
 
 
-    public function exitATeam(Request $request) // when a team decide to quit a team
+    public function exitATeam(Request $request) // when a teamMEMBER decide to quit a team
     {
         $checkfirst =  User::where('remember_token', "=",  trim($request->token))->count();
         if ($checkfirst > 0) {
