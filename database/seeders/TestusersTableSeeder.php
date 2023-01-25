@@ -21,403 +21,403 @@ class TestusersTableSeeder extends Seeder
         \DB::table('testusers')->insert(array (
             0 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 144,
                 'postid' => 71,
-                'user' => 'Mr. Jason Turner',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Mr. Jason Turner',
             ),
             1 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 145,
                 'postid' => 71,
-                'user' => 'Broderick Douglas',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Broderick Douglas',
             ),
             2 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 146,
                 'postid' => 71,
-                'user' => 'Viva Wiegand',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Viva Wiegand',
             ),
             3 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 147,
                 'postid' => 71,
-                'user' => 'Dr. Gail Zboncak',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Dr. Gail Zboncak',
             ),
             4 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 148,
                 'postid' => 71,
-                'user' => 'Dejon Leannon',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Dejon Leannon',
             ),
             5 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 149,
                 'postid' => 72,
-                'user' => 'Odell Jakubowski',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Odell Jakubowski',
             ),
             6 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 150,
                 'postid' => 72,
-                'user' => 'Ulices Weber',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Ulices Weber',
             ),
             7 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 151,
                 'postid' => 72,
-                'user' => 'Ola Krajcik',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Ola Krajcik',
             ),
             8 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 152,
                 'postid' => 72,
-                'user' => 'Richmond Wiegand',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Richmond Wiegand',
             ),
             9 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 153,
                 'postid' => 72,
-                'user' => 'Mr. Davon Steuber DVM',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Mr. Davon Steuber DVM',
             ),
             10 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 154,
                 'postid' => 73,
-                'user' => 'Merl Gusikowski Jr.',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Merl Gusikowski Jr.',
             ),
             11 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 155,
                 'postid' => 73,
-                'user' => 'Prof. Elias Schimmel',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Prof. Elias Schimmel',
             ),
             12 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 156,
                 'postid' => 73,
-                'user' => 'Dr. Stacy Huels DDS',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Dr. Stacy Huels DDS',
             ),
             13 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 157,
                 'postid' => 73,
-                'user' => 'Javon Breitenberg',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Javon Breitenberg',
             ),
             14 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 158,
                 'postid' => 73,
-                'user' => 'Madelynn Reichert',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Madelynn Reichert',
             ),
             15 => 
             array (
+                'created_at' => '2022-05-31 15:24:11',
                 'id' => 159,
                 'postid' => 74,
-                'user' => 'Kiana Lubowitz',
-                'created_at' => '2022-05-31 15:24:11',
                 'updated_at' => '2022-05-31 15:24:11',
+                'user' => 'Kiana Lubowitz',
             ),
             16 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 160,
                 'postid' => 74,
-                'user' => 'Guiseppe Crist II',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Guiseppe Crist II',
             ),
             17 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 161,
                 'postid' => 74,
-                'user' => 'Braulio Sanford I',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Braulio Sanford I',
             ),
             18 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 162,
                 'postid' => 74,
-                'user' => 'Dr. Randal Stark',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Dr. Randal Stark',
             ),
             19 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 163,
                 'postid' => 74,
-                'user' => 'Zion Rolfson Jr.',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Zion Rolfson Jr.',
             ),
             20 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 164,
                 'postid' => 75,
-                'user' => 'Carmella Barton',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Carmella Barton',
             ),
             21 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 165,
                 'postid' => 75,
-                'user' => 'Friedrich Greenholt',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Friedrich Greenholt',
             ),
             22 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 166,
                 'postid' => 75,
-                'user' => 'Stefanie Gislason',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Stefanie Gislason',
             ),
             23 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 167,
                 'postid' => 75,
-                'user' => 'Marshall Murray',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Marshall Murray',
             ),
             24 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 168,
                 'postid' => 75,
-                'user' => 'Ms. Zola Mitchell III',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Ms. Zola Mitchell III',
             ),
             25 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 169,
                 'postid' => 76,
-                'user' => 'Mr. Jaylon Schulist',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Mr. Jaylon Schulist',
             ),
             26 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 170,
                 'postid' => 76,
-                'user' => 'Mr. Mario Ziemann',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Mr. Mario Ziemann',
             ),
             27 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 171,
                 'postid' => 76,
-                'user' => 'Sonya Kihn',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Sonya Kihn',
             ),
             28 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 172,
                 'postid' => 76,
-                'user' => 'Prof. Germaine Schroeder',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Prof. Germaine Schroeder',
             ),
             29 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 173,
                 'postid' => 76,
-                'user' => 'Willow Bechtelar II',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Willow Bechtelar II',
             ),
             30 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 174,
                 'postid' => 77,
-                'user' => 'Sofia Stamm Sr.',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Sofia Stamm Sr.',
             ),
             31 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 175,
                 'postid' => 77,
-                'user' => 'Francesca Konopelski',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Francesca Konopelski',
             ),
             32 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 176,
                 'postid' => 77,
-                'user' => 'Stephany Towne',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Stephany Towne',
             ),
             33 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 177,
                 'postid' => 77,
-                'user' => 'Tess Stokes',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Tess Stokes',
             ),
             34 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 178,
                 'postid' => 77,
-                'user' => 'Niko Lemke',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Niko Lemke',
             ),
             35 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 179,
                 'postid' => 78,
-                'user' => 'Jackeline Brakus',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Jackeline Brakus',
             ),
             36 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 180,
                 'postid' => 78,
-                'user' => 'Shea Schaden',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Shea Schaden',
             ),
             37 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 181,
                 'postid' => 78,
-                'user' => 'Prof. Richie Dickens',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Prof. Richie Dickens',
             ),
             38 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 182,
                 'postid' => 78,
-                'user' => 'Miss Zelda Fay DDS',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Miss Zelda Fay DDS',
             ),
             39 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 183,
                 'postid' => 78,
-                'user' => 'Robyn Pfeffer',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Robyn Pfeffer',
             ),
             40 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 184,
                 'postid' => 79,
-                'user' => 'Amara Simonis',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Amara Simonis',
             ),
             41 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 185,
                 'postid' => 79,
-                'user' => 'Sarina Nienow',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Sarina Nienow',
             ),
             42 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 186,
                 'postid' => 79,
-                'user' => 'Keara Koch',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Keara Koch',
             ),
             43 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 187,
                 'postid' => 79,
-                'user' => 'Ena McLaughlin',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Ena McLaughlin',
             ),
             44 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 188,
                 'postid' => 79,
-                'user' => 'Jess Hauck',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Jess Hauck',
             ),
             45 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 189,
                 'postid' => 80,
-                'user' => 'Isom Hermann IV',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Isom Hermann IV',
             ),
             46 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 190,
                 'postid' => 80,
-                'user' => 'Gabrielle Effertz',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Gabrielle Effertz',
             ),
             47 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 191,
                 'postid' => 80,
-                'user' => 'Roslyn Bartoletti',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Roslyn Bartoletti',
             ),
             48 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 192,
                 'postid' => 80,
-                'user' => 'Camryn Gottlieb',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Camryn Gottlieb',
             ),
             49 => 
             array (
+                'created_at' => '2022-05-31 15:24:12',
                 'id' => 193,
                 'postid' => 80,
-                'user' => 'Rickey Klocko IV',
-                'created_at' => '2022-05-31 15:24:12',
                 'updated_at' => '2022-05-31 15:24:12',
+                'user' => 'Rickey Klocko IV',
             ),
         ));
         

@@ -21,18 +21,18 @@ class TestingTablesTableSeeder extends Seeder
         \DB::table('testing_tables')->insert(array (
             0 => 
             array (
-                'id' => 1,
-                'name' => 'Miss Kristy Deckow',
-                'lat' => 6131,
                 'created_at' => '2022-07-08 14:11:52',
+                'id' => 1,
+                'lat' => 6131,
+                'name' => 'Miss Kristy Deckow',
                 'updated_at' => '2022-07-08 14:11:52',
             ),
             1 => 
             array (
-                'id' => 2,
-                'name' => 'Robbie Trantow',
-                'lat' => 4359,
                 'created_at' => '2022-07-08 14:13:00',
+                'id' => 2,
+                'lat' => 4359,
+                'name' => 'Robbie Trantow',
                 'updated_at' => '2022-07-08 14:13:00',
             ),
         ));

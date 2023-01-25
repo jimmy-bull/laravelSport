@@ -773,7 +773,7 @@ class Teams extends Controller
             $range = 0; // IF STAYS NULL THAT MEANS THAT THE TEAM DID NOT PLAY A GAME IN THE CURRENT SEASON 
             if (count($finish) > 0) {
                 foreach (SqlRAws::getTeamRange($request->team, $finish[0]->sport_name)  as $key => $value) {
-                    $range = $value->ranking; // GET USER RANGE DEPENDINF ON SPORT AND SEASON
+                    $range = $value->ranking; // GET USER RANGE DEPENDINF ON SPORT AND SEASON u107789930@access904851272.webspace-data.io
                 }
             }
 

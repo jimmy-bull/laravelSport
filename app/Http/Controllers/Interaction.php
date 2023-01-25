@@ -338,12 +338,11 @@ class Interaction extends Controller
         // return 'not connected';
     }
     public function getRealtimeNotif(Request $request)
-    {
+    {  
         //0-10 $request->page
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
         if ($checkfirst > 0) {
             $mail =  User::where('remember_token', "=", $request->token)->value('email');
-
             return  Notification::Leftjoin("users__profile__photos", "notifications.who_sent_notification", "=", "users__profile__photos.email")
                 ->Leftjoin("users", "notifications.who_sent_notification", "=", "users.email")
                 ->where('notifications.email', "=", $mail)

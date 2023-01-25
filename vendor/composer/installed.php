@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '5d0763df717d477db056ce26f6ffe983bc157c6f',
+        'reference' => 'fbe4c0f305c461857263e9cfc6b0ec7c351ce720',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -415,6 +415,15 @@
                 0 => 'v8.83.26',
             ),
         ),
+        'kitloong/laravel-migrations-generator' => array(
+            'pretty_version' => 'v6.7.1',
+            'version' => '6.7.1.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../kitloong/laravel-migrations-generator',
+            'aliases' => array(),
+            'reference' => '9e790b776d5caf01174bd7ee10158cb0d4c44a0f',
+            'dev_requirement' => true,
+        ),
         'kodova/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
@@ -436,7 +445,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '5d0763df717d477db056ce26f6ffe983bc157c6f',
+            'reference' => 'fbe4c0f305c461857263e9cfc6b0ec7c351ce720',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(
@@ -544,6 +553,15 @@
             'reference' => '14daed4296fae74d9e3201d2c4925d1acb7aa614',
             'dev_requirement' => true,
         ),
+        'myclabs/php-enum' => array(
+            'pretty_version' => '1.8.4',
+            'version' => '1.8.4.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../myclabs/php-enum',
+            'aliases' => array(),
+            'reference' => 'a867478eae49c9f59ece437ae7f9506bfaa27483',
+            'dev_requirement' => true,
+        ),
         'nesbot/carbon' => array(
             'pretty_version' => '2.63.0',
             'version' => '2.63.0.0',
@@ -596,6 +614,15 @@
             'install_path' => __DIR__ . '/../opis/closure',
             'aliases' => array(),
             'reference' => '3d81e4309d2a927abbe66df935f4bb60082805ad',
+            'dev_requirement' => false,
+        ),
+        'orangehill/iseed' => array(
+            'pretty_version' => 'v3.0.2',
+            'version' => '3.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../orangehill/iseed',
+            'aliases' => array(),
+            'reference' => '11f4355cdffc570eb231259f8700d760215df3fe',
             'dev_requirement' => false,
         ),
         'phar-io/manifest' => array(
