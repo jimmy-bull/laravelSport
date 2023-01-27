@@ -386,7 +386,7 @@ Route::get('/get_post_id/{token}/{who}/{id}', [Post::class, 'getPost_Id']);
 Route::get('/getpostonfield/{token}', [Post::class, 'getPostONfield']);
 Route::get('/add_likes/{post_id}/{token}', [Post::class, 'addLikes']);
 Route::get('/add_comments/{post_id}/{comment}/{token}', [Post::class, 'addComments']);
-Route::get('/get_comments/{post_id}/{postType}/{token}', [Post::class, 'getComments']);
+Route::get('/get_comments/{page}/{post_id}/{postType}/{token}', [Post::class, 'getComments']);
 
 // 
 Route::get('/get_likes_and_comments_count/{id}/{token}', [Post::class, 'getLikesAndCommentsCount']);

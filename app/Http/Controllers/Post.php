@@ -514,11 +514,13 @@ class Post extends Controller
                 }
                 $getMainComments =  Comment::join('users', "users.id", "=", "comments.who_commented_id")
                     ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
-                    ->whereIn('post_id',   $ids)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname", "comments.id"])->get();
+                    ->whereIn('post_id',   $ids)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname", "comments.id"])
+                    ->skip($request->page)->take(10)->get();
             } else {
                 $getMainComments =  Comment::join('users', "users.id", "=", "comments.who_commented_id")
                     ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
-                    ->where('post_id', "=", $request->post_id)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname", "comments.id"])->get();
+                    ->where('post_id', "=", $request->post_id)->select(["comment", "image", "post_id", "comments.created_at", "users.name", "users.lastname", "comments.id"])
+                    ->skip($request->page)->take(10)->get();
             }
             $newTable = [];
             foreach ($getMainComments  as $key => $value) {
