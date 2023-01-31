@@ -118,4 +118,57 @@ class SqlRAws extends Controller
             ->get()->unique()->skip($page)->take(10);
         return $who_was_asked;
     }
+    public static function distance($lat, $long)
+    {
+        return 'ABS( 
+            (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2) * 
+            sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 / 180)) . '
+             *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long * (3.1415926535898 / 180)) . ') / 2)  
+             *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long * (3.1415926535898 / 180)) . ') / 2)  )),
+            sqrt(1 - (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2) * 
+            sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180)) *  ' . cos($lat * (3.1415926535898 / 180)) . '
+           *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long * (3.1415926535898 / 180)) . ') / 2)  
+          *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long * (3.1415926535898 / 180)) . ') / 2)  
+          )) )) * 6372.797 )';
+
+        // this calcul is base on this function:
+        /*---------------------------------------------------------------*/
+        /*
+    Titre : Calcul la distance entre 2 points en km                                                                       
+                                                                                                                          
+    URL   : https://phpsources.net/code_s.php?id=1091
+    Auteur           : sheppy1                                                                                            
+    Website auteur   : https://lejournalabrasif.fr/qwanturank-concours-seo-qwant/                                         
+    Date édition     : 05 Aout 2019                                                                                       
+    Date mise à jour : 16 Aout 2019                                                                                      
+    Rapport de la maj:                                                                                                    
+    - fonctionnement du code vérifié                                                                                    
+*/
+        /*---------------------------------------------------------------*/
+
+        // function distance($lat1, $lng1, $lat2, $lng2, $miles = false)
+        // {
+        //     $pi80 = M_PI / 180;
+        //     $lat1 *= $pi80;
+        //     $lng1 *= $pi80;
+        //     $lat2 *= $pi80;
+        //     $lng2 *= $pi80;
+
+        //     $r = 6372.797; // rayon moyen de la Terre en km
+        //     $dlat = $lat2 - $lat1;
+        //     $dlng = $lng2 - $lng1;
+
+        //     $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlng / 2) * sin($dlng / 2);
+        //     // return $a;
+        //     $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        //     $km = $r * $c;
+
+        //     return ($miles ? ($km * 0.621371192) : $km);
+        // }
+        //echo  distance(45.7698747385, 4.82857516905, 49.1850251668, -0.370004009634) . ' CAEN LYON <br/><br/>';
+
+        // echo  distance(45.7698747385, 4.82857516905, 49.2074415651, -0.330690059361) . ' lyon herou <br/><br/>';
+
+        // echo  distance(45.7698747385, 3.0429756448, 48.862834158, 2.33616696102) . ' PARIS lyon <br/><br/>';
+    }
 }

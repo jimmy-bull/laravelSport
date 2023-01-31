@@ -11,6 +11,7 @@ use App\Models\FollowingSystem;
 use App\Models\NotificationToken;
 use App\Models\Notification;
 use App\Models\Teammember;
+use App\Http\Controllers\SqlRAws;
 
 class Interaction extends Controller
 {
@@ -41,38 +42,32 @@ class Interaction extends Controller
         }
         $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
 
-
-
+        /**
+         * FILTRE de base: sport, de la distance du lieu,
+         * Sport: tout mes sport, ou sport specifique
+         * lieu: du plus proche au plus eloigné ou distance précise au tour de mois;
+         * Nombre de victoire dans le sport ou les sport sélectionner,
+         * rang dans la saison actuele ou saison précise
+         * par fairplay: du plus grand au plus pétit, ou une moyenne de fairplay selectionné,
+         * pareil pour ponctualité
+         */
+        /**
+         * CREE DES UTILISATEUR QUI ON:  deux équipe, avec photo de profil,que je suis et qui me suive, avec 3 poste chacun
+         */
+        // GET USER NEAR ME THAT HAVE THE SAME TEAMS AS ME
         $firstSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
             ->leftjoin('teams', 'users.email', '=', 'teams.email')
             ->whereIn("teams.sport_name", $sport)
             ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email"])
-            ->orderBy(DB::raw('ABS( 
-                 (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-                 sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-                  *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-                  *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  )),
-                 sqrt(1 - (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-                 sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180)) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-                *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-               *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-               )) )) * 6372.797 )'))->get()->groupBy("city")->skip($request->page)->take(11);
+            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
+            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
 
+        // GET USER NEAR ME THAT NOT HAVE THE SAME TEAMS AS ME; GET THIS ONLY WHEN THE FIRST RESULT IS NOT 10
         $secondSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
             ->leftJoin('teams', 'users.email', '=', 'teams.email')
             ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email"])
-            ->orderBy(DB::raw('ABS( 
-                 (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-                 sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-                  *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-                  *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  )),
-                 sqrt(1 - (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-                 sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180)) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-                *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-               *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-               )) )) * 6372.797 )'))->get()->groupBy("city")->skip($request->page)->take(11);
+            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
+            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
 
 
 
@@ -150,16 +145,7 @@ class Interaction extends Controller
             ->where("name", "LIKE", "{$request->q}%")
             ->orWhere("users.lastname", "LIKE", "{$request->q}%")
             ->select(['users.city',  "users__profile__photos.image", 'users.name',  'lastname', "users.email"])
-            ->orderBy(DB::raw('ABS( 
-             (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-             sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-              *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-              *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  )),
-             sqrt(1 - (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-             sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180)) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-            *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-           *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-           )) )) * 6372.797 )'))->get()->groupBy("city")->skip($request->page)->take(10);
+            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
         $lastSend = [];
         foreach ($_OnUserSearch as $key => $value) {
             array_push($lastSend, $_OnUserSearch[$key][0]);
@@ -209,16 +195,7 @@ class Interaction extends Controller
             ->where("users.email", '!=',  User::where('remember_token', "=", $request->token)->value('email'))
             ->where("teams.sport_name", '!=',  null)
             ->select(['teams.logo',   'teams.team_name', "teams.sport_name", "teams.id", 'teams.cover', "teams.city", 'teams.email'])
-            ->orderBy(DB::raw('ABS( 
-             (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-             sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-              *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-              *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  )),
-             sqrt(1 - (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2) * 
-             sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat  * (3.1415926535898 /  180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180)) *  ' . cos($lat * (3.1415926535898 /  180)) . '
-            *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-           *  sin( ( (longitude * (3.1415926535898 /  180)) - ' . ($long  * (3.1415926535898 /  180)) . ') / 2)  
-           )) )) * 6372.797 )'))->get()->skip($request->page)->take(11);
+            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->skip($request->page)->take(11);
         return    $firstSearch;
     }
     public function searchTeams_nolocation(Request $request)
@@ -338,7 +315,7 @@ class Interaction extends Controller
         // return 'not connected';
     }
     public function getRealtimeNotif(Request $request)
-    {  
+    {
         //0-10 $request->page
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
         if ($checkfirst > 0) {

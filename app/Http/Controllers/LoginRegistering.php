@@ -16,9 +16,12 @@ class LoginRegistering extends Controller
     {
         if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
             $verify_if_email_exist = User::where('email', "=", $request->email)->count();
+            $verify_if_speudo_exist = User::where('speudo', "=", $request->pseudo)->count();
             if ($verify_if_email_exist > 0) {
                 return 'This email already exists.';
-            } else if ($verify_if_email_exist == 0) {
+            } else if ($verify_if_speudo_exist > 0) {
+                return 'This speudo already exists.';
+            } else if ($verify_if_email_exist == 0 && $verify_if_speudo_exist == 0) {
                 $token_without_hash = Str::random(100);
                 $accounts = new  User;
                 $accounts->email =  $request->email;
@@ -30,10 +33,11 @@ class LoginRegistering extends Controller
                 $accounts->remember_token = $token_without_hash;
                 $accounts->latitude =  $request->latitude;
                 $accounts->longitude  =  $request->longitude;
+                $accounts->speudo =  $request->pseudo;
                 $accounts->save();
                 $_Email_verif = new Email_verif();
                 $codey =  $_Email_verif->index($request->email);
-             //   return $codey;
+                //   return $codey;
                 $info = [
                     'user_name' => $request->firstname . $request->lastname,
                     'code' =>   $codey,

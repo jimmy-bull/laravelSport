@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('throttle:120,1')->get(
-    '/register/{email}/{password}/{lastname}/{firstname}/{ville}/{latitude}/{longitude}',
+    '/register/{email}/{password}/{lastname}/{firstname}/{ville}/{latitude}/{longitude}/{pseudo}',
     [LoginRegistering::class, 'register']
 );
 Route::middleware('throttle:120,1')->get(
