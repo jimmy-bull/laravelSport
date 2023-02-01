@@ -118,8 +118,9 @@ class SqlRAws extends Controller
             ->get()->unique()->skip($page)->take(10);
         return $who_was_asked;
     }
-    public static function distance($lat, $long)
-    {
+    public static function distance($lat, $long) // NB: I'm not using the method again just keept it in case.
+    {         //  ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
+        // ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
         return 'ABS( 
             (2 * atan2( sqrt(  (  sin( (  (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2) * 
             sin( ( (latitude * (3.1415926535898 /  180)) - ' . ($lat * (3.1415926535898 / 180)) . ') / 2)  + cos(latitude * (3.1415926535898 /  180) ) *  ' . cos($lat * (3.1415926535898 / 180)) . '

@@ -28,6 +28,31 @@ class Interaction extends Controller
     public function searchFriends(Request $request)
     {
 
+        /**
+         * This code is a SQL query that performs the following operations on a table named "users":
+         *SELECT: It selects all columns (*) from the "users" table.
+         *ST_Distance_Sphere: It calculates the spherical distance between two geographical points: 
+         * - the first point is specified by the coordinates (-0.330690059361, 49.2074415651), and the second point
+         * - is stored in the "location" column of the "users" table. The calculated distance is given an alias name "distance".
+
+         *HAVING: It filters the rows based on the condition "distance < 100 * 1000", meaning 
+         * it only returns the rows where the calculated distance is less than 100 kilometers.
+         * 
+         *ORDER BY: It sorts the result set in ascending order based on the "distance" column.
+         *LIMIT: It limits the number of returned rows to 5, meaning the query returns only the first 5 rows of the sorted result set.
+         */
+
+
+
+
+
+        //    return dd (DB::select(DB::raw("SELECT *, ST_Distance_Sphere(POINT(-0.330690059361, 49.2074415651), location) as distance
+        //    FROM `users`
+        //    HAVING distance < 100 * 1000
+        //    ORDER BY distance limit 5")));
+
+
+
         $lat = $request->lat;
         $long = $request->long;
 
@@ -46,8 +71,8 @@ class Interaction extends Controller
          * FILTRE de base: sport, de la distance du lieu,
          * Sport: tout mes sport, ou sport specifique
          * lieu: du plus proche au plus eloigné ou distance précise au tour de mois;
-         * Nombre de victoire dans le sport ou les sport sélectionner,
-         * rang dans la saison actuele ou saison précise
+        //   * Nombre de victoire,
+        //  * rang dans la saison actuelle ou saison précise
          * par fairplay: du plus grand au plus pétit, ou une moyenne de fairplay selectionné,
          * pareil pour ponctualité
          */
@@ -55,21 +80,21 @@ class Interaction extends Controller
          * CREE DES UTILISATEUR QUI ON:  deux équipe, avec photo de profil,que je suis et qui me suive, avec 3 poste chacun
          */
         // GET USER NEAR ME THAT HAVE THE SAME TEAMS AS ME
+        // filtre de base: sport: tout les sport; avec fairplay: c'est desc, pareil pour ponctualité;
         $firstSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
             ->leftjoin('teams', 'users.email', '=', 'teams.email')
             ->whereIn("teams.sport_name", $sport)
             ->where("users.email", "!=",  $getEmail)
             ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
-            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
+            ->orderBy(DB::raw("ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location)"))->get()->groupBy("city")->skip($request->page)->take(10);
+
 
         // GET USER NEAR ME THAT NOT HAVE THE SAME TEAMS AS ME; GET THIS ONLY WHEN THE FIRST RESULT IS NOT 10
         $secondSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
             ->leftJoin('teams', 'users.email', '=', 'teams.email')
             ->where("users.email", "!=",  $getEmail)
             ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
-            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
-
-
+            ->orderBy(DB::raw("ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location)"))->get()->groupBy("city")->skip($request->page)->take(10);
 
         if (count($firstSearch) == 10) {
             return  $firstSearch;

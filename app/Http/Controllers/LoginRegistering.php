@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Email_verif;
 use App\Mail\registerMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class LoginRegistering extends Controller
 {
@@ -34,6 +35,7 @@ class LoginRegistering extends Controller
                 $accounts->latitude =  $request->latitude;
                 $accounts->longitude  =  $request->longitude;
                 $accounts->speudo =  $request->pseudo;
+                $accounts->location = DB::raw("POINT(" .  $request->longitude . ',' . $request->latitude . ")");
                 $accounts->save();
                 $_Email_verif = new Email_verif();
                 $codey =  $_Email_verif->index($request->email);
