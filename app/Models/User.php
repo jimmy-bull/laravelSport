@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\phone;
+use App\Models\PostTable;
+use App\Models\ImageVideoTable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -38,4 +41,18 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    /**
+     * Get the phone associated with the user.
+     */
+    public function phone()
+    {
+        return $this->hasOne(phone::class, 'users_id');
+    }
+    public function post()
+    {
+       
+
+        //return $this->hasManyThrough(ImageVideoTable::class, PostTable::class, "user_id", "post_id");
+
+    }
 }

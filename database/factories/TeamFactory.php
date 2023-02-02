@@ -22,12 +22,17 @@ class TeamFactory extends Factory
     public function definition()
     {
         return [
-            'team_name' => $this->faker->firstName(),
-            'sport_name' => $this->faker->lastName(),
-            'city' => $this->faker->city(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'logo' => "public/profils_photos/d9iLyrjdEi31WPL6mBzKPLJtVIJh6fLYZMVer58L.png",
-            'cover' => "public/teams_photos/IPhHmyyQ06SSNgsGvEbCq9NcufYA5cO4RxDB2YnQ.jpg"
+            // 'team_name' => $this->faker->firstName(),
+            // 'sport_name' => $this->faker->lastName(),
+            // 'city' => $this->faker->city(),
+            // 'email' => $this->faker->unique()->safeEmail(),
+            // 'logo' => $this->faker->randomElement([
+            //     "public/teams_photos/barc.jpg",
+            //     "public/teams_photos/mars.png",
+            //     "public/teams_photos/paris.jpg",
+            //     "public/teams_photos/paris_2.jpg"
+            // ]),
+            // 'cover' => "public/teams_photos/IPhHmyyQ06SSNgsGvEbCq9NcufYA5cO4RxDB2YnQ.jpg"
 
         ];
     }

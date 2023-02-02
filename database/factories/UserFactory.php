@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 use App\Models\Users_Profile_Photo;
 use App\Models\FollowingSystem;
 use App\Models\PostTable;
+use App\Models\Team;
+use App\Models\AskGame;
+use App\Models\phone;
+use Illuminate\Support\Facades\DB;
 
 class UserFactory extends Factory
 {
@@ -37,6 +41,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             "country" => 'FRANCE',
             "speudo" => $this->faker->name(),
+            "location" =>  DB::raw("POINT(" .  $this->faker->longitude() . ',' . $this->faker->latitude() . ")")
         ];
     }
     public function configure()
@@ -63,6 +68,40 @@ class UserFactory extends Factory
                 "status" => "online"
             ]); // 
 
+            phone::factory(1)->create([
+                'users_id' => $user->id,
+                "phone_number" => $this->faker->numberBetween(10000, 20000)
+            ]); //
+            // Team::factory(1)->create([
+            //     'team_name' => $this->faker->name(),
+            //     'sport_name' => "Football",
+            //     'city' => $this->faker->city(),
+            //     'email' => $user->email,
+            //     'logo' => $this->faker->randomElement([
+            //         "public/teams_photos/barc.jpg",
+            //         "public/teams_photos/mars.png",
+            //         "public/teams_photos/paris.jpg",
+            //         "public/teams_photos/paris_2.jpg"
+            //     ]),
+            //     'cover' => $this->faker->randomElement([
+            //         "public/teams_photos/barc.jpg",
+            //         "public/teams_photos/mars.png",
+            //         "public/teams_photos/paris.jpg",
+            //         "public/teams_photos/paris_2.jpg"
+            //     ])
+
+            // ]);
+            //to do soon
+            // AskGame::factory(1)->create([
+            //     "who_is_asking" => "jbull635@gmail.com",
+            //     "who_was_asked" => "Jamal@gmail.com",
+            //     'date_of_game' => $this->faker->dateTimeBetween("2023-01-01 16:30:18", "2023-02-02 16:30:18"),
+            //     "hours_of_game" => "19h30",
+            //     "place_of_game" => $this->faker->city(),
+            //     "team_of_asker" => "Real Team",
+            //     "team_of_who_was_asked" => "Jamal Foot",
+            //     "status" => "finish"
+            // ]);
             // Users_Profile_Photo, FollowingSystem public/profils_photos/profil_main.jpeg
         });
     }

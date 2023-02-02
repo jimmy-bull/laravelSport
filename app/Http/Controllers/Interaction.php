@@ -12,6 +12,8 @@ use App\Models\NotificationToken;
 use App\Models\Notification;
 use App\Models\Teammember;
 use App\Http\Controllers\SqlRAws;
+use App\Models\phone;
+use App\Models\PostTable;
 
 class Interaction extends Controller
 {
@@ -27,6 +29,13 @@ class Interaction extends Controller
     }
     public function searchFriends(Request $request)
     {
+
+        // $users = phone::find(16161);
+        // return $users->user->get();
+        // return User::find(16161)->phone()->get();
+          return (User::find(11160)->post()->get()->groupBy("post_id"));
+
+      //  return (PostTable::find(20299)->user->name);
 
         /**
          * This code is a SQL query that performs the following operations on a table named "users":
@@ -73,14 +82,14 @@ class Interaction extends Controller
          * lieu: du plus proche au plus eloigné ou distance précise au tour de mois;
         //   * Nombre de victoire,
         //  * rang dans la saison actuelle ou saison précise
-         * par fairplay: du plus grand au plus pétit, ou une moyenne de fairplay selectionné,
+         * par fairplay: du plus grand au plus pétit,
          * pareil pour ponctualité
          */
         /**
          * CREE DES UTILISATEUR QUI ON:  deux équipe, avec photo de profil,que je suis et qui me suive, avec 3 poste chacun
          */
         // GET USER NEAR ME THAT HAVE THE SAME TEAMS AS ME
-        // filtre de base: sport: tout les sport; avec fairplay: c'est desc, pareil pour ponctualité;
+        // filtre de base: sport: tout les sport; avec fairplay: c'est desc, pareil pour ponctualité; lieu: plus proche au plus loin;
         $firstSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
             ->leftjoin('teams', 'users.email', '=', 'teams.email')
             ->whereIn("teams.sport_name", $sport)
