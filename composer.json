@@ -12,6 +12,8 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "laravel/vapor-cli": "^1.54",
+        "laravel/vapor-core": "^2.28",
         "orangehill/iseed": "^3.0"
     },
     "require-dev": {
