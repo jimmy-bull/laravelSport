@@ -734,7 +734,11 @@ class Teams extends Controller
                 $team_of_asker = SqlRAws::palmares_fuction($request->team, $request->years, $request->page, 8, 11);
             }
             if (count($team_of_asker) == 10) {
-                return ($team_of_asker);
+
+                foreach ($team_of_asker as $key => $value) {
+                    array_push($finish, $value);
+                }
+                // array_push($finish, $team_of_asker);
             } else if (count($team_of_asker) < 10) {
                 if ($request->season == 'h') {
                     $who_was_asked = SqlRAws::palmares_fuction_who_was_asked($request->team, $request->years, $request->page, 11, 2);

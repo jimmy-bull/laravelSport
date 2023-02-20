@@ -254,13 +254,21 @@ Route::post('/update_team_logo_image', [Teams::class, 'update_team_logo_image'])
 
 Route::get('/searchFriends/{lat}/{long}/{token}/{page}', [Interaction::class, 'searchFriends']);
 
+Route::get('/searchTeams/{lat}/{long}/{page}/{token}', [Interaction::class, 'searchTeams']);
+
+Route::get(
+    '/searchWithInputWithlocation/{q}/{lat}/{long}/{sport}/{maxkm}/{page}/{token}',
+    [Interaction::class, 'searchWithInputWithlocation']
+);
+
+Route::get(
+    '/searchteamWithInputWithlocation/{q}/{lat}/{long}/{sport}/{maxkm}/{page}/{token}',
+    [Interaction::class, 'searchTeamsWithInput']
+);
+
 Route::get('/searchFriendsNOlocation/{token}/{page}', [Interaction::class, 'searchFriendsNOlocation']);
 
-Route::get('/searchWithInputWithlocation/{q}/{lat}/{long}/{token}/{page}', [Interaction::class, 'searchWithInputWithlocation']);
-
 Route::get('/searchWithInputWithNolocation/{token}/{page}', [Interaction::class, 'searchWithInputWithNolocation']);
-
-Route::get('/searchTeams/{lat}/{long}/{token}/{page}', [Interaction::class, 'searchTeams']);
 
 Route::get('/followingSystem_insert/{email}/{token}', [Interaction::class, 'followingSystem_insert']);
 

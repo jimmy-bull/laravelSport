@@ -27,213 +27,380 @@ class Interaction extends Controller
             return 'not connected';
         }
     }
+
     public function searchFriends(Request $request)
     {
+        $lat = $request->lat;
+        $long = $request->long;
+        $sport = [];
+        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
+        if ($checkfirst > 0) {
+            $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
+            foreach ($sport__ as $key => $value) {
+                array_push($sport, $value->sport_name);
+            }
+        } else {
+            return 'not connected';
+        }
+        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
+        $firstSearch = [];
 
-        // $users = phone::find(16161);
-        // return $users->user->get();
-        // return User::find(16161)->phone()->get();
-          return (User::find(11160)->post()->get()->groupBy("post_id"));
-
-      //  return (PostTable::find(20299)->user->name);
-
-        /**
-         * This code is a SQL query that performs the following operations on a table named "users":
-         *SELECT: It selects all columns (*) from the "users" table.
-         *ST_Distance_Sphere: It calculates the spherical distance between two geographical points: 
-         * - the first point is specified by the coordinates (-0.330690059361, 49.2074415651), and the second point
-         * - is stored in the "location" column of the "users" table. The calculated distance is given an alias name "distance".
-
-         *HAVING: It filters the rows based on the condition "distance < 100 * 1000", meaning 
-         * it only returns the rows where the calculated distance is less than 100 kilometers.
-         * 
-         *ORDER BY: It sorts the result set in ascending order based on the "distance" column.
-         *LIMIT: It limits the number of returned rows to 5, meaning the query returns only the first 5 rows of the sorted result set.
-         */
-
-
-
-
-
-        //    return dd (DB::select(DB::raw("SELECT *, ST_Distance_Sphere(POINT(-0.330690059361, 49.2074415651), location) as distance
-        //    FROM `users`
-        //    HAVING distance < 100 * 1000
-        //    ORDER BY distance limit 5")));
-
-
+        if (count($sport) > 0) {
+            // $secondSearch = [];
+            //LA RECHERCHE SE FERA QUE SIL'UUTILISATEUR A DEJA CRÉÉ UNE EQUIPE AVEC UN SPORT. ON LE MONTRERA QUE LES RESULTAT LE CONCERNANT:
+            //c'EST A DIRE QUE LES RESULTAT EN FONCTION DE SON SPORT
+            $firstSearch = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+                distance FROM users WHERE email != '" . $getEmail . "' ) AS users"))
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->select([
+                    'users.city',
+                    "users__profile__photos.image",
+                    'users.name',
+                    'users.lastname',
+                    "users.email",
+                    "users.speudo",
+                    "users.longitude",
+                    "users.latitude",
+                    DB::raw("SUM(punctuality) as punctuality_count"),
+                    DB::raw("SUM(fair_play) as fair_play_count"),
+                    DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                    "users.id",
+                    "users.distance",
+                    "teams.sport_name"
+                ])->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->groupBy(
+                    [
+                        "users.city",
+                        "users__profile__photos.image",
+                        'users.name',
+                        'users.lastname',
+                        "users.email",
+                        "users.speudo",
+                        "teams.sport_name"
+                    ]
+                )
+                ->skip($request->page)->take(10)
+                ->get();
+            return  $firstSearch;
+        } else if (count($sport) == 0) {
+            return "veuillez ajouter un sport afin de pouvoir faire une recherche.";
+            // AU CAS OU Y'A PAS DE SPORT CRÉÉ PAR L'UTILISQTEUR:
+            // SELECT MOI TOUT LES ELEMENTS LES PLUS PROCHE DE MOI ET ORDONNÉ LES EN FONCTION DE LEURS RATE
+            // $firstSearch = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+            // distance FROM users WHERE email !='" . $getEmail  . "'ORDER BY distance  asc LIMIT " . $request->page . ",10) AS users "))
+            //     ->leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
+            //     ->leftjoin('teams', 'users.email', '=', 'teams.email')
+            //     ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+            //     ->select([
+            //         'users.city',
+            //         "users__profile__photos.image",
+            //         'users.name',
+            //         'users.lastname',
+            //         "users.email",
+            //         "users.speudo",
+            //         "users.longitude",
+            //         "users.latitude",
+            //         DB::raw("SUM(fair_play) as fair_play_count"),
+            //         DB::raw("SUM(punctuality) as punctuality_count"),
+            //         "users.id",
+            //         "users.distance",
+            //         DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+            //     ])
+            //     ->orderBy("users.distance")
+            //     ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+            //     ->groupBy(
+            //         [
+            //             "users.city",
+            //             "users__profile__photos.image",
+            //             'users.name',
+            //             'users.lastname',
+            //             "users.email",
+            //             "users.speudo",
+            //         ]
+            //     )
+            //     ->get();
+        }
+    }
+    public function searchTeams(Request $request)
+    {
+        // $arr = array(112, 21, 130, 140, 2, 42); //  [21,112,130,140,2,42];  [21,112,130,2,140,42], [21,112,130,2,42,140]
+        // for ($i = 0; $i < count($arr) - 1; $i++) {
+        //     for ($j = 0; $j < count($arr) - 1; $j++) {
+        //         if ($arr[$j] > $arr[$j + 1]) {
+        //             $temp = $arr[$j + 1];
+        //             $arr[$j + 1] = $arr[$j];
+        //             $arr[$j] = $temp;
+        //         }
+        //     }
+        // }
+        // return;
+        // return ($arr);
 
         $lat = $request->lat;
         $long = $request->long;
-
         $sport = [];
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
-
         if ($checkfirst > 0) {
             $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
             foreach ($sport__ as $key => $value) {
                 array_push($sport, $value->sport_name);
             }
+        } else {
+            return "not connected";
         }
         $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
-
-        /**
-         * FILTRE de base: sport, de la distance du lieu,
-         * Sport: tout mes sport, ou sport specifique
-         * lieu: du plus proche au plus eloigné ou distance précise au tour de mois;
-        //   * Nombre de victoire,
-        //  * rang dans la saison actuelle ou saison précise
-         * par fairplay: du plus grand au plus pétit,
-         * pareil pour ponctualité
-         */
-        /**
-         * CREE DES UTILISATEUR QUI ON:  deux équipe, avec photo de profil,que je suis et qui me suive, avec 3 poste chacun
-         */
-        // GET USER NEAR ME THAT HAVE THE SAME TEAMS AS ME
-        // filtre de base: sport: tout les sport; avec fairplay: c'est desc, pareil pour ponctualité; lieu: plus proche au plus loin;
-        $firstSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftjoin('teams', 'users.email', '=', 'teams.email')
-            ->whereIn("teams.sport_name", $sport)
-            ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
-            ->orderBy(DB::raw("ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location)"))->get()->groupBy("city")->skip($request->page)->take(10);
-
-
-        // GET USER NEAR ME THAT NOT HAVE THE SAME TEAMS AS ME; GET THIS ONLY WHEN THE FIRST RESULT IS NOT 10
-        $secondSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftJoin('teams', 'users.email', '=', 'teams.email')
-            ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email", "users.speudo"])
-            ->orderBy(DB::raw("ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location)"))->get()->groupBy("city")->skip($request->page)->take(10);
-
-        if (count($firstSearch) == 10) {
-            return  $firstSearch;
-        } else {
-            foreach ($secondSearch as $key => $value) {
-                $firstSearch[$key] = $secondSearch[$key];
-            }
+        if (count($sport) > 0) {
+            $firstSearch = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+            distance FROM users WHERE email != '" . $getEmail . "' ) AS users"))
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->select(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                        "distance",
+                        DB::raw("SUM(punctuality) as punctuality_count"),
+                        DB::raw("SUM(fair_play) as fair_play_count"),
+                        DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                    ]
+                )
+                ->groupBy(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                    ]
+                )
+                ->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->skip($request->page)->take(10)
+                ->get();
+            return    $firstSearch;
+        } else if (count($sport) == 0) {
+            return "veuillez ajouter un sport afin de pouvoir faire une recherche";
         }
-        $lastSend = [];
-        foreach ($firstSearch as $key => $value) {
-            array_push($lastSend, $firstSearch[$key][0]);
-        }
-        return  $lastSend;
-    }
-    public function searchFriendsNOlocation(Request $request)
-    {
-        $sport = [];
-        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
-
-        if ($checkfirst > 0) {
-            $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
-            foreach ($sport__ as $key => $value) {
-                array_push($sport, $value->sport_name);
-            }
-        }
-        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
-        $first =  User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftJoin('teams', 'users.email', '=', 'teams.email')
-            ->whereIn("teams.sport_name", $sport)
-            ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city', "users__profile__photos.image", 'users.name',  "users.lastname", "users.email"])
-            ->get()->groupBy("city")->skip($request->page)->take(10);
-
-        $second =  User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftJoin('teams', 'users.email', '=', 'teams.email')
-            // ->whereIn("teams.sport_name", $sport)
-            ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name', 'users.lastname', "users.email"])
-            ->get()->groupBy("city")->skip($request->page)->take(10);
-
-
-
-        if (count($first) == 10) {
-            return  $first;
-        } else {
-            foreach ($second as $key => $value) {
-                $first[$key] = $second[$key];
-            }
-        }
-        $lastSend = [];
-        foreach ($first as $key => $value) {
-            array_push($lastSend, $first[$key][0]);
-        }
-        return  $lastSend;
     }
     public function searchWithInputWithlocation(Request $request)
     {
         $lat = $request->lat;
         $long = $request->long;
+        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
 
         $sport = [];
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
-
         if ($checkfirst > 0) {
-            $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
-            foreach ($sport__ as $key => $value) {
-                array_push($sport, $value->sport_name);
+            if (count(json_decode($request->sport)) == 0) {
+                $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
+                foreach ($sport__ as $key => $value) {
+                    array_push($sport, $value->sport_name);
+                }
+            } else {
+                $sport = json_decode($request->sport);
             }
         }
-        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
-        $_OnUserSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftjoin('teams', 'users.email', '=', 'teams.email')
-            ->where("name", "LIKE", "{$request->q}%")
-            ->orWhere("users.lastname", "LIKE", "{$request->q}%")
-            ->select(['users.city',  "users__profile__photos.image", 'users.name',  'lastname', "users.email"])
-            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->groupBy("city")->skip($request->page)->take(10);
-        $lastSend = [];
-        foreach ($_OnUserSearch as $key => $value) {
-            array_push($lastSend, $_OnUserSearch[$key][0]);
+        $string = $request->q;
+        $users = [];
+        /// LA RECHERCHE SE FERA SELEMENT EN FONCTION DU SPORT QUE L'UTILISATEUR A CRÉÉ, 
+        //  SI L'UTILISATEUR N'AS PAS SPORT ON LUI DEMAND DE CRÉÉ UN SPORT, AU MOIN
+        if ($request->maxkm == 0) {
+            $users = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+                distance FROM users  WHERE email != '" . $getEmail . "') AS users"))
+                ->leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->where('name_lastname', "LIKE", "%" . $string . "%")
+                ->orWhere('speudo', "LIKE", "%" . $string . "%")
+                ->select(
+                    [
+                        'users.city',
+                        "users__profile__photos.image",
+                        'users.name',
+                        'users.lastname',
+                        "users.email",
+                        "users.speudo",
+                        DB::raw("ST_X(location) as longitude"),
+                        DB::raw("ST_Y(location) as latitude"),
+                        "users.name_lastname",
+                        "teams.sport_name",
+                        DB::raw("SUM(punctuality) as punctuality_count"),
+                        DB::raw("SUM(fair_play) as fair_play_count"),
+                        DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                        "distance"
+                    ]
+                )
+                ->groupBy(
+                    [
+                        "users.city",
+                        "users__profile__photos.image",
+                        'users.name',
+                        'users.lastname',
+                        "users.email",
+                        "users.speudo",
+                        "teams.sport_name",
+                    ]
+                )
+                ->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->skip($request->page)->take(10)
+                ->get();
+        } else if ($request->maxkm > 0) {
+            $users = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+                distance FROM users  WHERE email != '" . $getEmail . "'  HAVING distance <=" . $request->maxkm . " ) AS users"))
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->where('name_lastname', "LIKE", "%" . $string . "%")
+                ->orWhere('speudo', "LIKE", "%" . $string . "%")
+
+                ->select([
+                    'users.city',
+                    "users__profile__photos.image",
+                    'users.name',
+                    'users.lastname',
+                    "users.email",
+                    "users.speudo",
+                    DB::raw("ST_X(location) as longitude"),
+                    DB::raw("ST_Y(location) as latitude"),
+                    DB::raw("SUM(punctuality) as punctuality_count"),
+                    DB::raw("SUM(fair_play) as fair_play_count"),
+                    DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                    "users.id",
+                    "users.distance",
+                    "teams.sport_name",
+                    "users.name_lastname",
+                    "distance"
+                ])->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->groupBy(
+                    [
+                        "users.city",
+                        "users__profile__photos.image",
+                        'users.name',
+                        'users.lastname',
+                        "users.email",
+                        "users.speudo",
+                        "teams.sport_name"
+                    ]
+                )
+                ->skip($request->page)->take((10))
+                ->get();
         }
-        return  $lastSend;
+
+
+        return $users;
     }
-    public function searchWithInputWithNolocation(Request $request)
-    {
-        $sport = [];
-        $checkfirst =  User::where('remember_token', "=", $request->token)->count();
-
-        if ($checkfirst > 0) {
-            $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
-            foreach ($sport__ as $key => $value) {
-                array_push($sport, $value->sport_name);
-            }
-        }
-        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
-
-        $_OnUserSearch = User::leftJoin('users__profile__photos', 'users.email', '=', 'users__profile__photos.email')
-            ->leftjoin('teams', 'users.email', '=', 'teams.email')
-            ->where("name", "LIKE", "{$request->q}%")
-            ->orWhere("users.lastname", "LIKE", "{$request->q}%")
-            ->where("users.email", "!=",  $getEmail)
-            ->select(['users.city',  "users__profile__photos.image", 'users.name',  'lastname', 'users.email'])
-            ->groupBy("city")->skip($request->page)->take(10);
-        $lastSend = [];
-        foreach ($_OnUserSearch as $key => $value) {
-            array_push($lastSend, $_OnUserSearch[$key][0]);
-        }
-        return  $lastSend;
-    }
-
-    public function searchTeams(Request $request)
+    public function searchTeamsWithInput(Request $request)
     {
         $lat = $request->lat;
         $long = $request->long;
         $sport = [];
         $checkfirst =  User::where('remember_token', "=", $request->token)->count();
-        if ($checkfirst > 0) {
-            $sport__ = Team::where('email', "=",  User::where('remember_token', "=", $request->token)->value('email'))->select('sport_name')->get();
-            foreach ($sport__ as $key => $value) {
-                array_push($sport, $value->sport_name);
-            }
+        if ($checkfirst == 0) {
+            return "not connected";
         }
-        $firstSearch = User::leftjoin('teams', 'users.email', '=', 'teams.email')
-            ->where("users.email", '!=',  User::where('remember_token', "=", $request->token)->value('email'))
-            ->where("teams.sport_name", '!=',  null)
-            ->select(['teams.logo',   'teams.team_name', "teams.sport_name", "teams.id", 'teams.cover', "teams.city", 'teams.email'])
-            ->orderBy(DB::raw(SqlRAws::distance($lat, $long)))->get()->skip($request->page)->take(11);
-        return    $firstSearch;
-    }
-    public function searchTeams_nolocation(Request $request)
-    {
+        $getEmail =  User::where('remember_token', "=", $request->token)->value("email");
+        $string = $request->q;
+        $users = [];
+        $sport = json_decode($request->sport);
+
+        if ($request->maxkm == 0) {
+            $users = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+                distance FROM users WHERE email != '" . $getEmail . "' ) AS users"))
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->where('teams.team_name', "LIKE", "%" . $string . "%")
+                ->select(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                        "distance",
+                        DB::raw("SUM(punctuality) as punctuality_count"),
+                        DB::raw("SUM(fair_play) as fair_play_count"),
+                        DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                    ]
+                )
+                ->groupBy(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                    ]
+                )
+                ->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->skip($request->page)->take(10)
+                ->get();
+        } else if ($request->maxkm > 0) {
+            $users = DB::table(DB::raw("(SELECT *, ST_Distance_Sphere(POINT(" . $long . "," . $lat . "), location) as
+                distance FROM users  WHERE email != '" . $getEmail . "'  HAVING distance <=" . $request->maxkm . " ) AS users"))
+                ->join('teams', function ($join) use ($sport) {
+                    $join->on('users.email', '=', 'teams.email')->whereIn("teams.sport_name", $sport);
+                })
+                ->leftjoin("team_rates", "teams.team_name", "=", "team_rates.team_rated_name")
+                ->where('teams.team_name', "LIKE", "%" . $string . "%")
+                ->select(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                        "distance",
+                        DB::raw("SUM(punctuality) as punctuality_count"),
+                        DB::raw("SUM(fair_play) as fair_play_count"),
+                        DB::raw("SUM(fair_play + punctuality) as punctuality_fair_play_count"),
+                    ]
+                )
+                ->groupBy(
+                    [
+                        'teams.logo',
+                        'teams.team_name',
+                        "teams.sport_name",
+                        "teams.id",
+                        'teams.cover',
+                        "teams.city",
+                        'teams.email',
+                    ]
+                )
+                ->orderBy('distance')
+                ->orderBy(DB::raw("punctuality_fair_play_count"), "desc")
+                ->skip($request->page)->take(10)
+                ->get();
+        }
+        return $users;
     }
 
     public function followingSystem_insert(Request $request)

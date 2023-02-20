@@ -172,4 +172,133 @@ class SqlRAws extends Controller
 
         // echo  distance(45.7698747385, 3.0429756448, 48.862834158, 2.33616696102) . ' PARIS lyon <br/><br/>';
     }
+
+
+
+    public static function levenshtein_distance($a, $b)
+    {
+        $len_a = strlen($a);
+        $len_b = strlen($b);
+
+        if ($len_a === 0) {
+            return $len_b;
+        }
+
+        if ($len_b === 0) {
+            return $len_a;
+        }
+
+        $distance = array();
+        for ($i = 0; $i <= $len_a; $i++) {
+            $distance[$i][0] = $i;
+        }
+
+        for ($j = 0; $j <= $len_b; $j++) {
+            $distance[0][$j] = $j;
+        }
+
+        for ($i = 1; $i <= $len_a; $i++) {
+            for ($j = 1; $j <= $len_b; $j++) {
+                if ($a[$i - 1] === $b[$j - 1]) {
+                    $cost = 0;
+                } else {
+                    $cost = 1;
+                }
+
+                $distance[$i][$j] = min($distance[$i - 1][$j] + 1, $distance[$i][$j - 1] + 1, $distance[$i - 1][$j - 1] + $cost);
+            }
+        }
+
+        return $distance[$len_a][$len_b];
+    }
+
+    public static function compare_characters($string, $array_of_strings)
+    {
+        $results = array();
+        // $results["string"] = 'jimbull';
+
+        foreach ($array_of_strings as $array_string) {
+            $count = 0;
+            $rank = 0;
+            for ($i = 0; $i < strlen($string); $i++) {
+                if (strpos($array_string, $string[$i]) !== false) {
+                    // $count++;
+                    $rank = strpos($array_string, $string[$i]);
+                    $results[$array_string]["y'a quoi dans " . $string . " qui n'est pas dans " . $array_string][$string[$i] . $i] = $string[$i] . $rank;
+                } else {
+                    $count++;
+                    $results[$array_string]["y'a quoi dans " . $string . " qui n'est pas dans " . $array_string]["sup_1"][$string[$i] . $i] = $count;
+                }
+            }
+
+            for ($i = 0; $i < strlen($array_string); $i++) {
+                if (strpos($string, $array_string[$i]) !== false) {
+                    $rank = strpos($string, $array_string[$i]);
+                    $results[$array_string]["y'a quoi dans " . $array_string . " qui n'est pas dans " . $string][$array_string[$i] . $i] = $array_string[$i] . $rank;
+                } else {
+                    $count++;
+                    $results[$array_string]["y'a quoi dans " . $array_string . " qui n'est pas dans " . $string]["sup_2"][$array_string[$i] . $i] = $count;
+                }
+            }
+        }
+
+        //  arsort($results);
+        // echo 'jimbull';
+
+        return ($results);
+    }
+    // jimmybull = 22; jimmyjimmy = 9; angebulljimmy = 15; iimmbbuulljj" = 20;
+
+    // jimmyjimmy; jimmybull; angebulljimmy; iimmbbuulljj;
+
+    /**
+     * jimbull = distance(1) - nombre de fois (7) = -7; 7*0;
+     * jimmybull = distance (10 + 7) - nombre de fois (8)  ; 7*1;
+     *  sattaKoffi = distance (8 + 63) - nombre de fois(1);  nombre total(7) * nombre de lettre qui ne sont pas dedans(9) = 63
+     *  jimmyjimmy = distance(22 + 14) - nombre de fois(8) ;  7 * 2;
+     *  angebulljimmy = (38 + 28) - nombre de fois(8); 7 * 4;
+     * iimmbbuulljj = (36 + 7) - nombre(12); 7*1
+     * bull = (11) - 4 = -15;
+     * jimmy  = (1 + 7) - 4 = 4
+     */
+
+    //  distance = 0;  nombre de fois = 7;
+
+    //jimbull = -7; jimmybull = 9;  sattaKoffi =70;  jimmyjimmy = 28;  angebulljimmy = 58; iimmbbuulljj = 31;
+
+
+    // jimbull = -6; bull = -15; jimmy = 4; jimmybull = 9;  jimmyjimmy = 28; iimmbbuulljj = 31; angebulljimmy = 58; sattaKoffi = 70;
+
+
+    // 
+    /**
+     * LE CALCUL = (SUM(postionX - positionY) + (lengthSearch * ))
+     */
+
+    /**
+     * [0,1,2,3] jimmyy
+     * [b,u,l,l]
+     * [0,1,2,3,4,5,6]
+     * [j,i,m,b,u,l,l]                           [nombre d'echec, distance, nombre de reussite]; base distance = [0,0];  [j,i,m,b,u,l,l] = [0,1,2,3,4,5,6]
+     * 
+     * bull = 3 (24); = 27                       [3,24,8] =  [nombre d'echec, distance, nombre de reussite]; = 19 = 0,75 + 6 -(2) = 4,75
+     * jimmy = 5 (1);   = 6                      [5,1,7] = [nombre d'echec, distance, nombre de reussite]; = 1 + 0,2 - (1,4) = 0,2
+     * jimbull = 0 (0);  = 0                     [0,0,7] = [nombre d'echec, distance, nombre de reussite]; = 1
+     * 
+     * sattaKoffij= 14 (36); = 50;               [14,36,4] = [nombre d'echec, distance, nombre de reussite]; = 
+     *                                           46; (chaque lettre en moyenne doivent parcouri 4,18 fois) 1,27, 0,36  = 3,27 + 1,27 - (0,36) = 4,18
+     * 
+     *  jimmybull = 1 (17); = 18;                [1,18,15] = [nombre d'echec, distance, nombre de reussite];
+     * jimmyjimmy = 6 (26); =32;                 [6,32,11] = [nombre d'echec, distance, nombre de reussite];
+     * angebulljimmy = 5 (65); = 70;             [5,70,15] = [nombre d'echec, distance, nombre de reussite];
+     * iimmbbuulljj = 0 (57); = 57               [0,57,19] = [nombre d'echec, distance, nombre de reussite]; 48; 4,75  = 0 + 1,58 - (4,75)   =3,17
+     * jimbullpppppppp = 8 (3) = 11;             [8,3,14] = [nombre d'echec, distance, nombre de reussite]; 0,53 + 0,2 - (0,93) = 0,2
+     * 
+     * jimbull (0); jimmy(6);jimbullpppppppp(11);jimmybull(18); bull (27);jimmyjimmy (32); sattaKoffij (50); iimmbbuulljj (57); angebulljimmy(70)
+     */
+    public static function searchEngine($string, $array_of_strings)
+    {
+        $results = array();
+        $stringLenth = strlen($string);
+    }
 }

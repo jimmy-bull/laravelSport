@@ -33,15 +33,17 @@ class UserFactory extends Factory
             'name' => $this->faker->firstName(),
             'lastname' => $this->faker->name(),
             'city' => $this->faker->city(),
-            "latitude" => $this->faker->latitude(),
-            "longitude" => $this->faker->longitude(),
+            // "latitude" => $this->faker->latitude(),
+            // "longitude" => $this->faker->longitude(),
+            "latitude" => 49.18215994291596,
+            "longitude" => -0.35024680743103365,
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => '$2y$10$v91eT4OXFaMtA1macO4G3Ov8uAigOTHpoilWAkHiWkCwagiQfoJb2', // password
             'remember_token' => Str::random(10),
             "country" => 'FRANCE',
             "speudo" => $this->faker->name(),
-            "location" =>  DB::raw("POINT(" .  $this->faker->longitude() . ',' . $this->faker->latitude() . ")")
+            "location" =>  DB::raw("POINT(" .  -0.35024680743103365 . ',' . 49.18215994291596 . ")")
         ];
     }
     public function configure()
@@ -66,43 +68,27 @@ class UserFactory extends Factory
                 'user_id' => $user->id,
                 'who_can_see' => "monde",
                 "status" => "online"
-            ]); // 
+            ]); // créé aussi les images pour chaque post dans Le factory Postable
 
-            phone::factory(1)->create([
-                'users_id' => $user->id,
-                "phone_number" => $this->faker->numberBetween(10000, 20000)
-            ]); //
-            // Team::factory(1)->create([
-            //     'team_name' => $this->faker->name(),
-            //     'sport_name' => "Football",
-            //     'city' => $this->faker->city(),
-            //     'email' => $user->email,
-            //     'logo' => $this->faker->randomElement([
-            //         "public/teams_photos/barc.jpg",
-            //         "public/teams_photos/mars.png",
-            //         "public/teams_photos/paris.jpg",
-            //         "public/teams_photos/paris_2.jpg"
-            //     ]),
-            //     'cover' => $this->faker->randomElement([
-            //         "public/teams_photos/barc.jpg",
-            //         "public/teams_photos/mars.png",
-            //         "public/teams_photos/paris.jpg",
-            //         "public/teams_photos/paris_2.jpg"
-            //     ])
 
-            // ]);
-            //to do soon
-            // AskGame::factory(1)->create([
-            //     "who_is_asking" => "jbull635@gmail.com",
-            //     "who_was_asked" => "Jamal@gmail.com",
-            //     'date_of_game' => $this->faker->dateTimeBetween("2023-01-01 16:30:18", "2023-02-02 16:30:18"),
-            //     "hours_of_game" => "19h30",
-            //     "place_of_game" => $this->faker->city(),
-            //     "team_of_asker" => "Real Team",
-            //     "team_of_who_was_asked" => "Jamal Foot",
-            //     "status" => "finish"
-            // ]);
-            // Users_Profile_Photo, FollowingSystem public/profils_photos/profil_main.jpeg
+            Team::factory(1)->create([
+                'team_name' => $this->faker->name(),
+                'sport_name' => "Football",
+                'city' => $this->faker->city(),
+                'email' => $user->email,
+                'logo' => $this->faker->randomElement([
+                    "public/teams_photos/barc.jpg",
+                    "public/teams_photos/mars.png",
+                    "public/teams_photos/paris.jpg",
+                    "public/teams_photos/paris_2.jpg"
+                ]),
+                'cover' => $this->faker->randomElement([
+                    "public/teams_photos/barc.jpg",
+                    "public/teams_photos/mars.png",
+                    "public/teams_photos/paris.jpg",
+                    "public/teams_photos/paris_2.jpg"
+                ])
+            ]); // Créé aussi une demande match pour chaque equipe gangner dans le TeamFactory
         });
     }
 

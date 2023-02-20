@@ -21,12 +21,12 @@ class WinningFactory extends Factory
     public function definition()
     {
         return [
-            'game_id' => 106,
-            'score' => rand(4, 9),
-            'score_2' => rand(0, 3),
-            'winner_mail' => "jbull635@gmail.com",
-            'winner_team' => "Real Team",
-            "status" => "accepted"
+            // 'game_id' => 106,
+            // 'score' => rand(4, 9),
+            // 'score_2' => rand(0, 3),
+            // 'winner_mail' => "jbull635@gmail.com",
+            // 'winner_team' => "Real Team",
+            // "status" => "accepted"
         ];
     }
 }

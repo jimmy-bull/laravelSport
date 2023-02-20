@@ -15,6 +15,7 @@ use App\Models\Team;
 use App\Models\draw;
 use App\Models\CommentLike;
 use App\Models\SubCommentsLikes;
+use Illuminate\Support\Facades\DB;
 
 class Post extends Controller
 {
@@ -197,30 +198,48 @@ class Post extends Controller
         $unique_objects = [];
 
         if ($checkfirst > 0) {
+            //  return 'jimmy';
             //REcupere les post de ceux que je suis sur l'application
             $user_id = User::where('remember_token', "=", $request->token)->select('id')->get();
             $email = User::where('remember_token', "=", $request->token)->select('email')->get();
-            $fromDB =  PostTable::leftJoin('image_video_tables', "post_tables.id", "=", "image_video_tables.post_id")
-                ->leftJoin('users', "post_tables.user_id", "=", "users.id")
-                ->join('users__profile__photos', "users__profile__photos.email", "=", "users.email")
-                ->join('following_systems', "users.email", "=", "following_systems.thefollowed")
-                ->leftJoin('ask_games', "ask_games.id", "=", "post_tables.title")
-                ->leftJoin('winnings', "post_tables.title", '=', "winnings.game_id")
-                ->leftJoin('defeats', "post_tables.title", '=', "defeats.game_id")
-                ->leftJoin('draws', "post_tables.title", '=', "draws.game_id")
-                ->leftJoin('teams', "ask_games.team_of_asker", '=', "teams.team_name")
-                ->where('thefollower', "=",  $email[0]->email)
-                ->where('thefollowingState', "=", "isfollowing")
-                ->select([
-                    'post_tables.*', 'following_systems.*', 'following_systems.*', 'users__profile__photos.*', 'image_video_tables.*', 'users.*',
-                    'winnings.score as winningsScore', "defeats.score as defeatsScore", "draws.score as drawsScore",
-                    "ask_games.id", "ask_games.place_of_game", 'ask_games.hours_of_game',
-                    "ask_games.date_of_game", "winnings.winner_team", "winnings.winner_team", "defeats.looser_team", "post_tables.created_at as post_tables_created_at",
-                    'ask_games.status', "teams.sport_name", "post_tables.id as post_tables_id",
-                ])
-                ->orderBy("post_tables_created_at", "DESC")->get()->groupBy("post_tables_id")->skip(0)->take(10);
-            // 
-            //return  $fromDB;
+            $fromDB = DB::table(DB::raw("(SELECT * FROM post_tables) AS t1"))
+                ->select(
+                    't1.*',
+                    'following_systems.*',
+                    'following_systems.*',
+                    'users__profile__photos.*',
+                    'image_video_tables.*',
+                    'users.*',
+                    'winnings.score as winningsScore',
+                    'defeats.score as defeatsScore',
+                    'draws.score as drawsScore',
+                    'ask_games.id',
+                    'ask_games.place_of_game',
+                    'ask_games.hours_of_game',
+                    'ask_games.date_of_game',
+                    'winnings.winner_team',
+                    'winnings.winner_team',
+                    'defeats.looser_team',
+                    't1.created_at as post_tables_created_at',
+                    'ask_games.status',
+                    'teams.sport_name',
+                    't1.id as post_tables_id'
+                )
+                ->leftJoin('image_video_tables', 't1.id', '=', 'image_video_tables.post_id')
+                ->leftJoin('users', 't1.user_id', '=', 'users.id')
+                ->leftJoin('users__profile__photos', 'users__profile__photos.email', '=', 'users.email')
+                ->join('following_systems', 'users.email', '=', 'following_systems.thefollowed')
+                ->leftJoin('ask_games', 'ask_games.id', '=', 't1.title')
+                ->leftJoin('winnings', 't1.title', '=', 'winnings.game_id')
+                ->leftJoin('defeats', 't1.title', '=', 'defeats.game_id')
+                ->leftJoin('draws', 't1.title', '=', 'draws.game_id')
+                ->leftJoin('teams', 'ask_games.team_of_asker', '=', 'teams.team_name')
+                ->where('thefollower', '=', $email[0]->email)
+                ->where('thefollowingState', '=',  "isfollowing")
+                ->orderByDesc('post_tables_created_at')
+                ->skip($request->page)->take(10)
+                ->get()->groupBy('post_tables_id');
+            //return dd($fromDB);
             foreach ($fromDB as $key => $value) {
                 $images = [];
                 if ($value[0]->type == null) {
@@ -396,10 +415,6 @@ class Post extends Controller
             return   $newTable;
         }
     }
-
-
-
-
 
 
     public function addLikes(Request $request)
