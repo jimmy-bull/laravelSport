@@ -22,7 +22,7 @@ class PostTableFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (PostTable $postTable) {
-            ImageVideoTable::factory(3)->create([
+            ImageVideoTable::factory(1)->create([
                 'post_id' => $postTable->id,
                 'type' => "image",
                 'link' => $this->faker->randomElement([

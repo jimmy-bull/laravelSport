@@ -36,6 +36,8 @@ class LoginRegistering extends Controller
                 $accounts->longitude  =  $request->longitude;
                 $accounts->speudo =  $request->pseudo;
                 $accounts->location = DB::raw("POINT(" .  $request->longitude . ',' . $request->latitude . ")");
+                $accounts->name_lastname =  $request->lastname . $request->firstname;
+
                 $accounts->save();
                 $_Email_verif = new Email_verif();
                 $codey =  $_Email_verif->index($request->email);

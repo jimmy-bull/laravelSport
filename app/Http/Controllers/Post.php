@@ -202,7 +202,7 @@ class Post extends Controller
             //REcupere les post de ceux que je suis sur l'application
             $user_id = User::where('remember_token', "=", $request->token)->select('id')->get();
             $email = User::where('remember_token', "=", $request->token)->select('email')->get();
-            $fromDB = DB::table(DB::raw("(SELECT * FROM post_tables) AS t1"))
+            $fromDB = DB::table(DB::raw("(SELECT * FROM post_tables limit 10) AS t1"))
                 ->select(
                     't1.*',
                     'following_systems.*',
@@ -237,9 +237,9 @@ class Post extends Controller
                 ->where('thefollower', '=', $email[0]->email)
                 ->where('thefollowingState', '=',  "isfollowing")
                 ->orderByDesc('post_tables_created_at')
-                ->skip($request->page)->take(10)
+                // ->skip($request->page)->take(10)
                 ->get()->groupBy('post_tables_id');
-            //return dd($fromDB);
+        //     return dd($fromDB);
             foreach ($fromDB as $key => $value) {
                 $images = [];
                 if ($value[0]->type == null) {
@@ -249,6 +249,7 @@ class Post extends Controller
                             $unique_objects[intval($obj->title)] = $obj;
                         }
                     }
+                    //  return dd($unique_objects;
                     //  return $unique_objects;
                     foreach ($unique_objects as $key => $value) {
                         if ($value->drawsScore == null) {
@@ -414,6 +415,7 @@ class Post extends Controller
             }
             return   $newTable;
         }
+        return "not connected";
     }
 
 

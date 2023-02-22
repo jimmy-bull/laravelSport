@@ -32,6 +32,7 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->firstName(),
             'lastname' => $this->faker->name(),
+            'name_lastname' => $this->faker->name() . $this->faker->firstName(),
             'city' => $this->faker->city(),
             // "latitude" => $this->faker->latitude(),
             // "longitude" => $this->faker->longitude(),

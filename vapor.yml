@@ -2,10 +2,10 @@ id: 42884
 name: osport
 environments:
   production:
+    database: osport
     memory: 1024
     cli-memory: 512
     runtime: "php-8.2:al2"
-    database:vapor
     build:
       - "composer install --no-dev"
       - "php artisan event:cache"
